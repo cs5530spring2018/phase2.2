@@ -46,6 +46,12 @@ public class InitializeDb {
 
             System.out.println("Creating feedback scores...");
             makeFeebackScores(con.stmt, 100);
+
+            System.out.println("Creating trust records...");
+            makeTrustRecords(con.stmt, 100);
+
+            System.out.println("Creating favorites...");
+            makeFavorites(con.stmt, 100);
         }
         catch (Exception e)
         {
@@ -184,6 +190,41 @@ public class InitializeDb {
             temp_reviewer = reviewee + Integer.toString(numScores-i-1);
             usefulness = i % 3;
             service.createScoredFeedback(stmt, temp_reviewee, temp_car, temp_reviewer, usefulness);
+        }
+    }
+
+    private static void makeTrustRecords(Statement stmt, int numRecords) {
+        DbTrustService service = new DbTrustService();
+        String user = "username";
+        String reviewer;
+        String reviewee;
+        int trust_score;
+
+        for (int i=0; i<numRecords-1; i++) {
+            reviewer = user + Integer.toString(i);
+            reviewee = user + Integer.toString(numRecords-i-1);
+            trust_score = i % 2;
+            if (i != (numRecords-i-1))
+                service.createTrust(stmt, reviewer, reviewee, trust_score);
+        }
+    }
+
+    private static void makeFavorites(Statement stmt, int numRecords) {
+        DbFavoritesService service = new DbFavoritesService();
+        String user = "username";
+        String temp_user1;
+        String temp_user2;
+        String car = "abcd";
+        String temp_car;
+
+        for (int i=0; i<numRecords-1; i++) {
+            temp_user1 = user + Integer.toString(i);
+            temp_user2 = user + Integer.toString(numRecords-i-1);
+            temp_car = car + Integer.toString(i);
+            if (i != (numRecords-i-1)) {
+                service.createFavorite(stmt, temp_user1, temp_car);
+                service.createFavorite(stmt, temp_user2, temp_car);
+            }
         }
     }
 }
