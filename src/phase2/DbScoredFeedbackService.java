@@ -27,7 +27,7 @@ public class DbScoredFeedbackService {
 
         try {
             query = "INSERT INTO ScoredFB (reviewee, car, reviewer, usefulness_score)" +
-                    "VALUES (" + reviewee + ", " + car + ", " + reviewer + ", " + Integer.toString(usefullness) + ");";
+                    " VALUES ('" + reviewee + "', '" + car + "', '" + reviewer + "', '" + Integer.toString(usefullness) + "')";
 
             stmt.execute(query);
         }

@@ -22,7 +22,7 @@ public class DbUserService {
 
         try {
             query = "INSERT INTO " + table + "(login, password, name, address, phone)" +
-                    "VALUES (" + login + ", " + password + ", " + name + ", " + address + ", " + phone + ");";
+                    " VALUES ('" + login + "', '" + password + "', '" + name + "', '" + address + "', '" + phone + "')";
 
             stmt.execute(query);
         }

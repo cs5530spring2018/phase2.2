@@ -8,14 +8,10 @@ import java.util.Scanner;
 
 public class TestDriver {
 
-
-    /**
-     * @param args
-     */
     public static void displayMenu()
     {
         System.out.println("        Welcome to UUber System     ");
-        System.out.println("1. search a course by cname and dname:");
+        System.out.println("1. register a user:");
         System.out.println("2. enter your own query:");
         System.out.println("3. exit:");
         System.out.println("pleasse enter your choice:");
@@ -26,8 +22,11 @@ public class TestDriver {
         System.out.println("Test Driver");
         Connector2 con=null;
         String choice;
-        String cname;
-        String dname;
+        String un;
+        String pw;
+        String uname;
+        String addr;
+        String phone;
         String sql=null;
         int c=0;
 
@@ -69,12 +68,19 @@ public class TestDriver {
                     continue;
                 if (c==1)
                 {
-                    System.out.println("please enter a cname:");
-                    while ((cname = in.readLine()) == null && cname.length() == 0);
-                    System.out.println("please enter a dname:");
-                    while ((dname = in.readLine()) == null && dname.length() == 0);
-                    Course course=new Course();
-                    System.out.println(course.getCourse(cname, dname, con.stmt));
+                    System.out.println("please enter a username:");
+                    while ((un = in.readLine()) == null && un.length() == 0);
+                    System.out.println("please enter a password:");
+                    while ((pw = in.readLine()) == null && pw.length() == 0);
+                    System.out.println("please enter a name:");
+                    while ((uname = in.readLine()) == null && uname.length() == 0);
+                    System.out.println("please enter an address:");
+                    while ((addr = in.readLine()) == null && addr.length() == 0);
+                    System.out.println("please enter a phone #:");
+                    while ((phone = in.readLine()) == null && phone.length() == 0);
+
+                    DbUserService service = new DbUserService();
+                    service.createUberUser(con.stmt, un, pw, uname, addr, phone);
                 }
                 else if (c==2)
                 {

@@ -13,7 +13,7 @@ public class DbCarService {
 
         try {
             query = "INSERT INTO UberCar (vin, driver, category, make, model, year)" +
-                    "VALUES (" + vin + ", " + driver + ", " + category + ", " + make + ", " + model + ", " + Integer.toString(year)  + ");";
+                    " VALUES ('" + vin + "', '" + driver + "', '" + category + "', '" + make + "', '" + model + "', '" + Integer.toString(year)  + "')";
 
             stmt.execute(query);
         }
