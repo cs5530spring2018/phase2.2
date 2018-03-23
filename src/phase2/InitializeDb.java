@@ -3,6 +3,7 @@ package phase2;
 import java.util.*;
 import java.lang.*;
 import java.sql.*;
+import java.util.Date;
 
 public class InitializeDb {
 
@@ -36,8 +37,15 @@ public class InitializeDb {
             System.out.println("Making users and drivers...");
             makeUberUsers(con.stmt, 100);
             makeUberDrivers(con.stmt, 100);
+
             System.out.println("Creating vehicles...");
             makeUberCars(con.stmt, 100);
+
+            System.out.println("Creating car feedback...");
+            makeCarFeedback(con.stmt, 100);
+
+            System.out.println("Creating feedback scores...");
+            makeFeebackScores(con.stmt, 100);
         }
         catch (Exception e)
         {
@@ -135,6 +143,47 @@ public class InitializeDb {
             make = makes[index];
             model = models[index];
             service.createUberCar(stmt, temp_vin, temp_driver, category, make, model, year);
+        }
+    }
+
+    private static void makeCarFeedback(Statement stmt, int numFeedback) {
+        DbCarFeedbackService service = new DbCarFeedbackService();
+        String reviewer = "username";
+        String temp_reviewer;
+        String car = "abcd";
+        String temp_car;
+        int rating;
+        String comment;
+        String[] comments = {"Good Driver", "Bad Driver", "Okay", "One of the best cars"};
+        Date date = new Date();
+
+        for (int i=0; i<numFeedback; i++) {
+            temp_reviewer = reviewer + Integer.toString(i);
+            temp_car = car + Integer.toString(i);
+            rating = i % 10;
+            comment = comments[i%4];
+            if (i%5==0)
+                comment = null;
+
+            service.createCarFeedback(stmt, temp_reviewer, temp_car, rating, comment, date);
+        }
+    }
+
+    private static void makeFeebackScores(Statement stmt, int numScores) {
+        DbScoredFeedbackService service = new DbScoredFeedbackService();
+        String reviewee = "username";
+        String temp_reviewee;
+        String car = "abcd";
+        String temp_car;
+        String temp_reviewer;
+        int usefulness;
+        
+        for (int i=0; i<numScores/2-1; i++) {
+            temp_reviewee = reviewee + Integer.toString(i);
+            temp_car = car + Integer.toString(i);
+            temp_reviewer = reviewee + Integer.toString(numScores-i-1);
+            usefulness = i % 3;
+            service.createScoredFeedback(stmt, temp_reviewee, temp_car, temp_reviewer, usefulness);
         }
     }
 }

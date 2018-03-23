@@ -19,13 +19,12 @@ public class DbUserService {
     private void createUser(Statement stmt, String login, String password, String name, String address, String phone, String userType) {
         String query;
         String table = userType;
-        ResultSet results;
 
         try {
             query = "INSERT INTO " + table + "(login, password, name, address, phone)" +
                     "VALUES (" + login + ", " + password + ", " + name + ", " + address + ", " + phone + ");";
 
-            results = stmt.executeQuery(query);
+            stmt.execute(query);
         }
         catch (Exception e) {
             e.printStackTrace();
