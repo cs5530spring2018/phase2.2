@@ -3,7 +3,6 @@ package phase2;
 import java.util.*;
 import java.lang.*;
 import java.sql.*;
-import java.io.*;
 
 public class InitializeDb {
 
@@ -61,7 +60,7 @@ public class InitializeDb {
     }
 
     private static void makeUberUsers(Statement stmt, int numUsers) {
-        UserService service = new UserService();
+        DbUserService service = new DbUserService();
         String login = "username";
         String temp_user = login;
         String pw = "hunter2";
@@ -77,7 +76,7 @@ public class InitializeDb {
     }
 
     private static void makeUberDrivers(Statement stmt, int numUsers) {
-        UserService service = new UserService();
+        DbUserService service = new DbUserService();
         String login = "driverUsername";
         String temp_user = login;
         String pw = "hunter2";
@@ -109,7 +108,7 @@ public class InitializeDb {
         String model;
         int year = 2018;
         int index;
-        CarService service = new CarService();
+        DbCarService service = new DbCarService();
         for (int i=0; i<numCars; i++) {
             temp_vin = vin + Integer.toString(i);
             temp_driver = driver + Integer.toString(i);

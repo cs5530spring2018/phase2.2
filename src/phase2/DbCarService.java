@@ -5,8 +5,8 @@ import java.sql.*;
 import java.io.*;
 //import javax.servlet.http.*;
 
-public class CarService {
-    public CarService() { }
+public class DbCarService {
+    public DbCarService() { }
 
     public void createUberCar(Statement stmt, String vin, String driver, String category, String make, String model, int year) {
         String query;
