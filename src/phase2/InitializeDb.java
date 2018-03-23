@@ -52,6 +52,15 @@ public class InitializeDb {
 
             System.out.println("Creating favorites...");
             makeFavorites(con.stmt, 100);
+
+            System.out.println("Creating hours of ops...");
+            makeHoursOfOp(con.stmt, 100);
+
+            System.out.println("Creating reservation records");
+            makeReservations(con.stmt, 100);
+
+            System.out.println("Creating ride records");
+            makeRides(con.stmt, 100);
         }
         catch (Exception e)
         {
@@ -225,6 +234,63 @@ public class InitializeDb {
                 service.createFavorite(stmt, temp_user1, temp_car);
                 service.createFavorite(stmt, temp_user2, temp_car);
             }
+        }
+    }
+
+    private static void makeHoursOfOp(Statement stmt, int numRecords) {
+        DbHoursOfOpService service = new DbHoursOfOpService();
+        String driver = "driverUsername";
+        String temp_driver;
+        Date start = new Date();
+        Date finish = new Date();
+        int day;
+        long ms = start.getTime();
+
+        for (int i=0; i<numRecords; i++) {
+            day = i % 7;
+            temp_driver = driver + Integer.toString(i);
+            ms += 1000000;
+            finish.setTime(ms);
+            service.createHoursOfOp(stmt, temp_driver, start, finish, day);
+        }
+    }
+
+    private static void makeReservations(Statement stmt, int numRecords) {
+        DbReservationService service = new DbReservationService();
+        String user = "username";
+        String temp_user;
+        String car = "abcd";
+        String temp_car;
+        Date time = new Date();
+        long ms = time.getTime();
+
+        for (int i=0; i<numRecords; i++) {
+            temp_user = user + Integer.toString(i);
+            temp_car = car + Integer.toString(i);
+            ms += 1000000;
+            time.setTime(ms);
+            service.createReservation(stmt, temp_user, temp_car, time);
+        }
+    }
+
+    private static void makeRides(Statement stmt, int numRecords) {
+        DbRideService service = new DbRideService();
+        String rider = "username";
+        String temp_rider;
+        String car = "abcd";
+        String temp_car;
+        int num_riders;
+        double cost = 5.55;
+        double distance = 1.75;
+        Date date = new Date();
+        String to_address = "The bar";
+        String from_address = "My house";
+
+        for (int i=0; i<numRecords; i++) {
+            temp_rider = rider + Integer.toString(i);
+            temp_car = car + Integer.toString(i);
+            num_riders = i % 2 + 1;
+            service.createRide(stmt, temp_rider, temp_car, num_riders, cost, distance, date, to_address, from_address);
         }
     }
 }

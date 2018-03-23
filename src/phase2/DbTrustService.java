@@ -3,7 +3,7 @@ package phase2;
 import java.sql.Statement;
 
 public class DbTrustService {
-
+    public DbTrustService() {}
     /*
     Trusts table:
 
