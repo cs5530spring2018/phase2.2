@@ -37,7 +37,7 @@ public class DbCarFeedbackService {
 
         try {
             query = "INSERT INTO CarFeedback(reviewer, car, rating, comment, date)" +
-                    "VALUES (" + reviewer + ", " + car + ", " + Integer.toString(rating) + ", " + comment + ", " + formattedDate + ");";
+                    " VALUES ('" + reviewer + "', '" + car + "', '" + Integer.toString(rating) + "', '" + comment + "', '" + formattedDate + "')";
 
             stmt.execute(query);
         }

@@ -19,7 +19,7 @@ public class DbFavoritesService {
 
         try {
             query = "INSERT INTO Favorites (user, car)" +
-                    "VALUES (" + user + ", " + car + ");";
+                    " VALUES ('" + user + "', '" + car + "')";
 
             stmt.execute(query);
         }
