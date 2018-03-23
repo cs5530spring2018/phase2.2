@@ -5,8 +5,8 @@ import java.sql.*;
 import java.io.*;
 //import javax.servlet.http.*;
 
-public class UserService {
-    public UserService() { }
+public class DbUserService {
+    public DbUserService() { }
 
     public void createUberUser(Statement stmt, String login, String password, String name, String address, String phone) {
         this.createUser(stmt, login, password, name, address, phone, "UberUser");
