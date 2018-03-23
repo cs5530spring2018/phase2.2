@@ -42,7 +42,10 @@ public class InitializeDb {
             makeUberCars(con.stmt, 100);
 
             System.out.println("Creating car feedback...");
+            makeCarFeedback(con.stmt, 100);
 
+            System.out.println("Creating feedback scores...");
+            makeFeebackScores(con.stmt, 100);
         }
         catch (Exception e)
         {
@@ -144,15 +147,6 @@ public class InitializeDb {
     }
 
     private static void makeCarFeedback(Statement stmt, int numFeedback) {
-            /*
-    reviewer varchar(32) NOT NULL,
-	car varchar(32) NOT NULL,
-	rating int NOT NULL,
-	comment varchar(255),
-	PRIMARY KEY (reviewer, car),
-	FOREIGN KEY (reviewer) REFERENCES UberUser(login),
-	FOREIGN KEY (car) REFERENCES UberCar(vin)
-     */
         DbCarFeedbackService service = new DbCarFeedbackService();
         String reviewer = "username";
         String temp_reviewer;
@@ -173,7 +167,24 @@ public class InitializeDb {
 
             service.createCarFeedback(stmt, temp_reviewer, temp_car, rating, comment, date);
         }
+    }
 
+    private static void makeFeebackScores(Statement stmt, int numScores) {
+        DbScoredFeedbackService service = new DbScoredFeedbackService();
+        String reviewee = "username";
+        String temp_reviewee;
+        String car = "abcd";
+        String temp_car;
+        String temp_reviewer;
+        int usefulness;
+        
+        for (int i=0; i<numScores/2-1; i++) {
+            temp_reviewee = reviewee + Integer.toString(i);
+            temp_car = car + Integer.toString(i);
+            temp_reviewer = reviewee + Integer.toString(numScores-i-1);
+            usefulness = i % 3;
+            service.createScoredFeedback(stmt, temp_reviewee, temp_car, temp_reviewer, usefulness);
+        }
     }
 }
 

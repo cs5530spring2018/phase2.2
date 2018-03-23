@@ -19,7 +19,7 @@ public class DbCarService {
         }
         catch (Exception e) {
             e.printStackTrace();
-            System.err.println ("Could not create new user: " + e.getMessage());
+            System.err.println ("Could not create new UberCar: " + e.getMessage());
         }
     }
 
