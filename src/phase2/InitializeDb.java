@@ -3,6 +3,7 @@ package phase2;
 import java.util.*;
 import java.lang.*;
 import java.sql.*;
+import java.util.Date;
 
 public class InitializeDb {
 
@@ -36,8 +37,12 @@ public class InitializeDb {
             System.out.println("Making users and drivers...");
             makeUberUsers(con.stmt, 100);
             makeUberDrivers(con.stmt, 100);
+
             System.out.println("Creating vehicles...");
             makeUberCars(con.stmt, 100);
+
+            System.out.println("Creating car feedback...");
+
         }
         catch (Exception e)
         {
@@ -136,6 +141,39 @@ public class InitializeDb {
             model = models[index];
             service.createUberCar(stmt, temp_vin, temp_driver, category, make, model, year);
         }
+    }
+
+    private static void makeCarFeedback(Statement stmt, int numFeedback) {
+            /*
+    reviewer varchar(32) NOT NULL,
+	car varchar(32) NOT NULL,
+	rating int NOT NULL,
+	comment varchar(255),
+	PRIMARY KEY (reviewer, car),
+	FOREIGN KEY (reviewer) REFERENCES UberUser(login),
+	FOREIGN KEY (car) REFERENCES UberCar(vin)
+     */
+        DbCarFeedbackService service = new DbCarFeedbackService();
+        String reviewer = "username";
+        String temp_reviewer;
+        String car = "abcd";
+        String temp_car;
+        int rating;
+        String comment;
+        String[] comments = {"Good Driver", "Bad Driver", "Okay", "One of the best cars"};
+        Date date = new Date();
+
+        for (int i=0; i<numFeedback; i++) {
+            temp_reviewer = reviewer + Integer.toString(i);
+            temp_car = car + Integer.toString(i);
+            rating = i % 10;
+            comment = comments[i%4];
+            if (i%5==0)
+                comment = null;
+
+            service.createCarFeedback(stmt, temp_reviewer, temp_car, rating, comment, date);
+        }
+
     }
 }
 
