@@ -94,7 +94,7 @@ public class InitializeDb {
         for (int i=0; i<numUsers; i++) {
             temp_user = login + Integer.toString(i);
             temp_name = name + Integer.toString(i);
-            service.createUberUser(stmt, temp_user, pw, temp_name, address, phone);
+            service.createUser(stmt, temp_user, pw, temp_name, address, phone, "UberUser");
         }
     }
 
@@ -110,7 +110,7 @@ public class InitializeDb {
         for (int i=0; i<numUsers; i++) {
             temp_user = login + Integer.toString(i);
             temp_name = name + Integer.toString(i);
-            service.createUberDriver(stmt, temp_user, pw, temp_name, address, phone);
+            service.createUser(stmt, temp_user, pw, temp_name, address, phone, "UberDriver");
         }
     }
 
