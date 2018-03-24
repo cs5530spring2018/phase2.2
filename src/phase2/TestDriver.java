@@ -7,29 +7,23 @@ import java.sql.ResultSetMetaData;
 import java.util.Scanner;
 
 public class TestDriver {
-
-    public static void displayMenu()
-    {
-        System.out.println("        Welcome to UUber System     ");
-        System.out.println("1. register a user:");
-        System.out.println("2. enter your own query:");
-        System.out.println("3. exit:");
-        System.out.println("pleasse enter your choice:");
-    }
+    private static Connector2 con = null;
 
     public static void main(String[] args) {
-        // TODO Auto-generated method stub
-        System.out.println("Test Driver");
-        Connector2 con=null;
-        String choice;
-        String un;
-        String pw;
-        String uname;
-        String addr;
-        String phone;
-        String sql=null;
-        int c=0;
+        try{
+            connectToDB();
+        } catch(Exception e) {
+            System.out.println("Something went wrong");
+        } finally {
+            try {
+                con.closeConnection();
+            } catch (Exception e) {
+                //Don't handle errors when closing connection
+            }
+        }
+    }
 
+    private static void connectToDB() throws Exception {
         String hostname;
         String username;
         String password;
@@ -45,87 +39,74 @@ public class TestDriver {
         System.out.println("Enter db name: ");
         dbName = sc.next();
 
-        try
-        {
-            //remember to replace the password
-            con= new Connector2(hostname, username, password, dbName);
-            System.out.println ("Database connection established");
+        try {
+            con = new Connector2(hostname, username, password, dbName);
+            System.out.println("Database connection established");
+            selectionMenu();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println ("Error while attempting to connect to database.");
+            throw(e);
+        }
+    }
 
+    private static void selectionMenu() throws Exception {
+        String choice;
+        String sql;
+        int c;
+        try {
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-
-            while(true)
-            {
+            while(true) {
                 displayMenu();
                 while ((choice = in.readLine()) == null && choice.length() == 0);
                 try{
                     c = Integer.parseInt(choice);
-                }catch (Exception e)
-                {
-
+                }catch (Exception e) {
                     continue;
                 }
-                if (c<1 | c>3)
-                    continue;
-                if (c==1)
-                {
-                    System.out.println("please enter a username:");
-                    while ((un = in.readLine()) == null && un.length() == 0);
-                    System.out.println("please enter a password:");
-                    while ((pw = in.readLine()) == null && pw.length() == 0);
-                    System.out.println("please enter a name:");
-                    while ((uname = in.readLine()) == null && uname.length() == 0);
-                    System.out.println("please enter an address:");
-                    while ((addr = in.readLine()) == null && addr.length() == 0);
-                    System.out.println("please enter a phone #:");
-                    while ((phone = in.readLine()) == null && phone.length() == 0);
-
-                    DbUserService service = new DbUserService();
-                    service.createUberUser(con.stmt, un, pw, uname, addr, phone);
-                }
-                else if (c==2)
-                {
-                    System.out.println("please enter your query below:");
-                    while ((sql = in.readLine()) == null && sql.length() == 0)
-                        System.out.println(sql);
-                    ResultSet rs=con.stmt.executeQuery(sql);
-                    ResultSetMetaData rsmd = rs.getMetaData();
-                    int numCols = rsmd.getColumnCount();
-                    while (rs.next())
-                    {
-                        //System.out.print("cname:");
-                        for (int i=1; i<=numCols;i++)
-                            System.out.print(rs.getString(i)+"  ");
-                        System.out.println("");
-                    }
-                    System.out.println(" ");
-                    rs.close();
-                }
-                else
-                {
-                    System.out.println("EoM");
-                    con.stmt.close();
-
-                    break;
+                switch(c){
+                    case 1:
+                        System.out.println("Doing Nothing");
+                        break;
+                    case 2:
+                        System.out.println("please enter your query below:");
+                        while ((sql = in.readLine()) == null && sql.length() == 0)
+                            System.out.println(sql);
+                        ResultSet rs = con.stmt.executeQuery(sql);
+                        ResultSetMetaData rsmd = rs.getMetaData();
+                        int numCols = rsmd.getColumnCount();
+                        while (rs.next()) {
+                            for (int i=1; i<=numCols;i++) {
+                                System.out.print(rs.getString(i) + "  ");
+                            }
+                            System.out.println("");
+                        }
+                        System.out.println(" ");
+                        rs.close();
+                        break;
+                    case 3:
+                        System.out.println("EoM");
+                        con.stmt.close();
+                        return;
+                    default:
+                        System.out.println("Invalid selection");
+                        continue;
                 }
             }
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             e.printStackTrace();
-            System.err.println ("Either connection error or query execution error!");
-        }
-        finally
-        {
-            if (con != null)
-            {
-                try
-                {
-                    con.closeConnection();
-                    System.out.println ("Database connection terminated");
-                }
-
-                catch (Exception e) { /* ignore close errors */ }
-            }
+            System.err.println ("Error executing query.");
+            throw(e);
         }
     }
+
+    private static void displayMenu() {
+        System.out.println("        Welcome to UUber System     ");
+        System.out.println("1. do nothing:");
+        System.out.println("2. enter your own query:");
+        System.out.println("3. exit:");
+        System.out.println("please enter your choice:");
+    }
+
 }
