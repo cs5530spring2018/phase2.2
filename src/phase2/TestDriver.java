@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.Statement;
 import java.util.Scanner;
 
 public class TestDriver {
@@ -16,6 +17,7 @@ public class TestDriver {
             System.out.println("Something went wrong");
         } finally {
             try {
+                System.out.println("Closing connection");
                 con.closeConnection();
             } catch (Exception e) {
                 //Don't handle errors when closing connection
@@ -65,10 +67,7 @@ public class TestDriver {
                     continue;
                 }
                 switch(c){
-                    case 1:
-                        System.out.println("Doing Nothing");
-                        break;
-                    case 2:
+                    case 0:
                         System.out.println("please enter your query below:");
                         while ((sql = in.readLine()) == null && sql.length() == 0)
                             System.out.println(sql);
@@ -84,10 +83,16 @@ public class TestDriver {
                         System.out.println(" ");
                         rs.close();
                         break;
-                    case 3:
+                    case 1:
                         System.out.println("EoM");
                         con.stmt.close();
                         return;
+                    case 2:
+                        registerUser(con.stmt, in, "UberUser");
+                        break;
+                    case 3:
+                        registerUser(con.stmt, in, "UberDriver");
+                        break;
                     default:
                         System.out.println("Invalid selection");
                         continue;
@@ -103,10 +108,47 @@ public class TestDriver {
 
     private static void displayMenu() {
         System.out.println("        Welcome to UUber System     ");
-        System.out.println("1. do nothing:");
-        System.out.println("2. enter your own query:");
-        System.out.println("3. exit:");
+        System.out.println("0. enter your own query:");
+        System.out.println("1. exit:");
+        System.out.println("2. register uber user:");
+        System.out.println("3. register uber driver:");
         System.out.println("please enter your choice:");
+    }
+
+    private static void registerUser(Statement stmt, BufferedReader in, String table) throws Exception {
+        DbUserService service = new DbUserService();
+        String login = null;
+        String password;
+        String name;
+        String address;
+        String phone;
+        Boolean isUberUser = (table.equals("UberUser"));
+        // Check username for uniqueness
+        Boolean foundUniqueLogin = false;
+        while (!foundUniqueLogin) {
+            System.out.println("Enter a username:");
+            while ((login = in.readLine()) == null && login.length() == 0);
+            if (isUberUser)
+                foundUniqueLogin = service.isUserLoginAvailable(stmt, login);
+            else
+                foundUniqueLogin = service.isDriverLoginAvailable(stmt, login);
+            if (!foundUniqueLogin)
+                System.out.println("Sorry, that username is already taken");
+        }
+
+        System.out.println("Enter a password:");
+        while ((password = in.readLine()) == null && password.length() == 0);
+        System.out.println("Enter your name:");
+        while ((name = in.readLine()) == null && name.length() == 0);
+        System.out.println("Enter an address:");
+        while ((address = in.readLine()) == null && address.length() == 0);
+        System.out.println("Enter a phone number:");
+        while ((phone = in.readLine()) == null && phone.length() == 0);
+
+        if (isUberUser)
+            service.createUberUser(stmt, login, password, name, address, phone);
+        else
+            service.createUberDriver(stmt, login, password, name, address, phone);
     }
 
 }
