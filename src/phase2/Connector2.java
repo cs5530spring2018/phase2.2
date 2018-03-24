@@ -64,5 +64,6 @@ public class Connector2
 	{
 		conn.close();
 		session.disconnect();
+		System.out.println("Connection closed");
 	}
 }

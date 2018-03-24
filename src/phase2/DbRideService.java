@@ -34,7 +34,7 @@ public class DbRideService {
 
         try {
             query = "INSERT INTO Ride (rider, car, num_riders, cost, distance, date, to_address, from_address)" +
-                    " VALUES ('" + rider + "', '" + car + "', '" + Integer.toString(num_riders) + "', '" + Double.toString(cost) + "', '" + Double.toString(distance) + "', '" + date + "', '" + to_address + "', '" + from_address + "')";
+                    " VALUES ('" + rider + "', '" + car + "', '" + Integer.toString(num_riders) + "', '" + Double.toString(cost) + "', '" + Double.toString(distance) + "', '" + formattedDate + "', '" + to_address + "', '" + from_address + "')";
 
             stmt.execute(query);
         }
