@@ -1,5 +1,6 @@
 package phase2;
 
+import javax.swing.plaf.nimbus.State;
 import java.lang.*;
 import java.sql.*;
 import java.io.*;
@@ -28,15 +29,15 @@ public class DbUserService {
 	PRIMARY KEY (login)
      */
 
-    public void createUberUser(Statement stmt, String login, String password, String name, String address, String phone) {
+    private void createUberUser(Statement stmt, String login, String password, String name, String address, String phone) {
         this.createUser(stmt, login, password, name, address, phone, "UberUser");
     }
 
-    public void createUberDriver(Statement stmt, String login, String password, String name, String address, String phone) {
+    private void createUberDriver(Statement stmt, String login, String password, String name, String address, String phone) {
         this.createUser(stmt, login, password, name, address, phone, "UberDriver");
     }
 
-    private void createUser(Statement stmt, String login, String password, String name, String address, String phone, String userType) {
+    public void createUser(Statement stmt, String login, String password, String name, String address, String phone, String userType) {
         String query;
         String table = userType;
 
@@ -52,6 +53,22 @@ public class DbUserService {
         }
     }
 
+    public boolean attemptToLogIn(Statement stmt, String login, String password, String table) throws Exception {
+        ResultSet results;
+        String query = "SELECT uu.login, uu.password FROM " + table + " uu WHERE uu.login='" + login + "' AND uu.password='" + password + "'";
+        try {
+            results = stmt.executeQuery(query);
+            return results.isBeforeFirst();
+        }
+        catch(Exception e) {
+            System.err.println("Unable to execute query:"+query+"\n");
+            System.err.println(e.getMessage());
+            throw(e);
+        }
+    }
+    public boolean isLoginAvailable(Statement stmt, String login, String table) throws Exception {
+        return checkNameAvailable(stmt, login, table);
+    }
     public boolean isDriverLoginAvailable(Statement stmt, String login) throws Exception {
         return checkNameAvailable(stmt, login, "UberDriver");
     }
