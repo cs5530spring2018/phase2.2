@@ -95,11 +95,6 @@ public class DbCarService {
             System.err.println(e.getMessage());
             throw(e);
         }
-        /*
-            SELECT uc.vin FROM UberCar uc, UberDriver ud WHERE
-            uc.vin=uc.car AND/OR ud.address LIKE "%addr%" AND/OR
-            uc.vin in vinUcQuery;
-         */
     }
 
     private ResultSet modelAggregateQuery(Statement stmt, ResultSet catResults, String model, String andor) throws Exception {
@@ -111,14 +106,14 @@ public class DbCarService {
             if (catResults.isBeforeFirst() && model.length() == 0) {
                 return catResults;
             }
+            if (model.length() == 0 && !catResults.isBeforeFirst())
+                modelQuery = "SELECT vin FROM UberCar";
             if (model.length() != 0)
                 modelQuery += " model='" + model + "'";
             if (andor.length() != 0) {
                 modelQuery += " " + andor + " vin IN " + vinSet;
 
             }
-            if (!catResults.isClosed())
-                catResults.close();
             modelResults = stmt.executeQuery(modelQuery);
             return modelResults;
         }
@@ -132,6 +127,8 @@ public class DbCarService {
     private ResultSet addressAggregateQuery(Statement stmt, ResultSet modelResults, String address, String andor) throws Exception {
         ResultSet addressResults;
         String vinSet = attrSetToString(modelResults, "vin");
+        if (andor.length() == 0)
+            andor = "AND";
         String addressQuery = "SELECT uc.vin AS vin FROM UberCar uc, UberDriver ud WHERE uc.driver=ud.login AND ud.address LIKE '%" + address + "%'";
         try {
             if (address.length() == 0)

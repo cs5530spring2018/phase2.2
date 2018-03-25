@@ -69,7 +69,7 @@ public class InitializeDb {
             //carService.createUberCar(con.stmt, "abcd0", "driverUsername0", "Truck", "Ford", "F-150", 2018);
             //ResultSet rset = carService.availableCars(con.stmt, 12.15f, 3);
             //System.out.println(carService.printableAvailableCars(rset));
-            ResultSet rset = carService.ucBrowser(con.stmt, "Truck", "OR", "Ford", "AND", "UT", "a");
+            ResultSet rset = carService.ucBrowser(con.stmt, "", "", "", "", "UT", "b");
             System.out.println(carService.sortedDataToString(rset));
 
             String sql;
