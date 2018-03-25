@@ -82,16 +82,45 @@ public class DbCarService {
     }
 
     private ResultSet categoryQuery(Statement stmt, String category) throws Exception {
-        ResultSet results;
         String query = "SELECT vin FROM UberCar";
         try {
-            if (category.length() != 0)
+            if (category.length() != 0) {
                 query += " WHERE category='" + category + "'";
-            results = stmt.executeQuery(query);
-            return results;
+            }
+            return stmt.executeQuery(query);
         }
         catch(Exception e) {
             System.err.println("Unable to execute query:"+query+"\n");
+            System.err.println(e.getMessage());
+            throw(e);
+        }
+    }
+
+    private ResultSet modelQuery(Statement stmt, String model) throws Exception {
+        String query = "SELECT vin FROM UberCar";
+        try {
+            if (model.length() != 0) {
+                query += " WHERE model LIKE %" + model + "%";
+            }
+            return  stmt.executeQuery(query);
+        }
+        catch(Exception e) {
+            System.err.println("Unable to execute query:"+query+"\n");
+            System.err.println(e.getMessage());
+            throw(e);
+        }
+    }
+
+    private ResultSet addressQuery(Statement stmt, String address) throws Exception {
+        String addressQuery = "SELECT uc.vin AS vin FROM UberCar uc, UberDriver ud WHERE uc.driver=ud.login AND ud.address LIKE '%" + address + "%'";
+        try {
+            if (address.length() == 0) {
+                return stmt.executeQuery("SELECT vin FROM UberCar");
+            }
+            return stmt.executeQuery(addressQuery);
+        }
+        catch(Exception e) {
+            System.err.println("Unable to execute query:"+addressQuery+"\n");
             System.err.println(e.getMessage());
             throw(e);
         }
@@ -211,6 +240,27 @@ public class DbCarService {
         return output;
     }
 
+    /*private ResultSet ucBrowserV2(Statement stmt, String category, String model, String address, String sort, int andOrMode) throws Exception{
+        String query;
+        ResultSet categoryResults = categoryQuery(stmt, category);
+        ResultSet modelResults = modelQuery(stmt, model);
+        ResultSet addrResults = addressQuery(stmt, address);
+        // 1. cat and model and add 2. cat and model or add 3. cat or model or add 4. cat and add or model
+        switch (andOrMode){
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+            default:
+                break;
+        }
+        //sort
+        //return
+    } */
     public ResultSet ucBrowser(Statement stmt, String category, String andor1, String model, String andor2, String address, String sort) throws Exception {
         ResultSet categoryResults = categoryQuery(stmt, category);
         ResultSet modelResults = modelAggregateQuery(stmt, categoryResults, model, andor1);

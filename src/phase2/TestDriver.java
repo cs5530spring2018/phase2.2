@@ -291,6 +291,7 @@ public class TestDriver {
                 break;
             case "3":
                 //TODO: browse cars menu
+                browseCars();
                 break;
             case "4":
                 //TODO: favorite car menu
@@ -342,6 +343,8 @@ public class TestDriver {
         while(address.equals("invalid")) {address = browseCarAddress(); }
         if(isCancelBrowseCars(address)) { return; }
 
+        browseCarAndOrExecute(category, model, address);
+
 
     }
 
@@ -380,7 +383,6 @@ public class TestDriver {
         String displayCategory = category.isEmpty() ? "any category" : category;
         String displayModel = model.isEmpty() ? "any model" : model;
         String displayAddress = address.isEmpty() ? "any city/state" : address;
-
         System.out.println("Select how to combine your filters:");
         System.out.println("1. " + displayCategory + " AND is a(n) " + displayModel + " AND is in " + displayAddress);
         System.out.println("2. " + displayCategory + " AND is a(n) " + displayModel + " OR is in " + displayAddress);
