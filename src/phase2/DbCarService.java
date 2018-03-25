@@ -21,7 +21,6 @@ public class DbCarService {
                     " VALUES ('" + vin + "', '" + driver + "', '" + category + "', '" + make + "', '" + model + "', '" + Integer.toString(year)  + "')" +
                     " ON DUPLICATE KEY UPDATE driver='" + driver + "'," + " category='" + category + "'," +
                     " make='" + make + "'," + " model='" + model + "'," + " year='" + Integer.toString(year) + "'";
-            System.out.println(query);
             stmt.execute(query);
         }
         catch (Exception e) {
@@ -48,13 +47,12 @@ public class DbCarService {
         }
     }
 
-    public String fetchUberCars(Statement stmt, String driver) throws Exception{
+    public ResultSet fetchUberCars(Statement stmt, String driver) throws Exception{
         String query;
         try {
             query = "SELECT * FROM UberCar WHERE driver='" + driver + "'";
             System.out.println("Fetching all cars for driver: " + driver);
-            ResultSet res = stmt.executeQuery(query);
-            return printableCars(res);
+            return stmt.executeQuery(query);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Could not fetch UberCars for user: " + driver);
@@ -77,11 +75,12 @@ public class DbCarService {
                             "    model: " + results.getString("model") + "    year: " + results.getString("year") + "\n";
                 }
             } else {
+                String[] labels = { "vin: ", "average: ", "driver: ", "category: ", "make: ", "model: ", "year: "};
                 while (results.next()) {
-                    output += "vin: " + results.getString("vin") + "    average: " + results.getString("average") +
-                            "    driver: " + results.getString("driver") + "    category: " + results.getString("category") +
-                            "    make: " + results.getString("make") + "    model: " + results.getString("model") +
-                            "    year: " + results.getString("year") + "\n";
+                    for (int i=1; i<=cols; i++) {
+                        output += labels[i-1] + results.getString(i) + "      ";
+                    }
+                    output += "\n";
                 }
             }
 
@@ -134,7 +133,6 @@ public class DbCarService {
             rs = stmt.executeQuery(query);
             vinSet = attrSetToString(rs, "vin");
             rs.close();
-            System.out.println("Return set: " + vinSet);
             return vinSet;
         }
         catch(Exception e) {
@@ -181,7 +179,6 @@ public class DbCarService {
 
         try {
             if (model.length() == 0) {
-                System.out.println("Returning set: " + catResults);
                 return catResults;
             }
             // Empty cat results
@@ -194,8 +191,7 @@ public class DbCarService {
                 modelQuery += " " + andor + " vin IN " + catResults;
 
             }
-            System.out.println("Using set: " + catResults);
-            System.out.println("Executing: " + modelQuery);
+
             modelResults = stmt.executeQuery(modelQuery);
             modelResultsStr = attrSetToString(modelResults, "vin");
             modelResults.close();
@@ -217,13 +213,10 @@ public class DbCarService {
         String addressQuery = "SELECT uc.vin AS vin FROM UberCar uc, UberDriver ud WHERE uc.driver=ud.login AND ud.address LIKE '%" + address + "%'";
         try {
             if (address.length() == 0) {
-                System.out.println("Return set: " + modelResults);
                 return modelResults;
             }
             addressQuery += " " + andor + " uc.vin IN " + modelResults;
 
-            System.out.println("Using set: " + modelResults);
-            System.out.println("Executing: " + addressQuery);
             addressResults = stmt.executeQuery(addressQuery);
             addressResultsStr = attrSetToString(addressResults, "vin");
             addressResults.close();
@@ -261,7 +254,6 @@ public class DbCarService {
 
             if (sort.equals("a")) {
                 sortQuery = "SELECT car, AVG(rating) AS average FROM CarFeedback WHERE car IN " + allVins + " GROUP BY car ORDER BY average ASC";
-                System.out.println("Executing query: " + sortQuery);
                 sortedResults = stmt.executeQuery(sortQuery);
             }
             else if (sort.equals("b")) {
@@ -272,7 +264,6 @@ public class DbCarService {
                 trustedFeedbackResults = stmt.executeQuery(tfQuery);
                 feedbackSet = attrSetToString(trustedFeedbackResults, "car");
                 sortQuery = "SELECT car, AVG(rating) AS average FROM CarFeedback WHERE car IN " + feedbackSet + " GROUP BY car ORDER BY average ASC";
-                System.out.println("Executing query: " + sortQuery);
                 sortedResults = stmt.executeQuery(sortQuery);
             }
             else {
