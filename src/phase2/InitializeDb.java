@@ -65,10 +65,10 @@ public class InitializeDb {
             //makeRides(con.stmt, 100);
 
             //System.out.println("Testing upsert");
-            //DbCarService carService = new DbCarService();
+            DbCarService carService = new DbCarService();
             //carService.createUberCar(con.stmt, "abcd0", "driverUsername0", "Truck", "Ford", "F-150", 2018);
-
-
+            String output = carService.availableCars(con.stmt, 12.15f, 1);
+            System.out.println(output);
             String sql;
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("please enter your query below:");
@@ -139,7 +139,7 @@ public class InitializeDb {
         }
     }
 
-    private static void makeUberCars(Statement stmt, int numCars) {
+    private static void makeUberCars(Statement stmt, int numCars) throws Exception {
         String query;
         ResultSet results;
         String vin = "abcd";
