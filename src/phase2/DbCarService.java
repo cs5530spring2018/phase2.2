@@ -36,16 +36,18 @@ public class DbCarService {
      */
     public String printableCars(ResultSet results, boolean withAverage) throws Exception {
         String output = "";
+        int cols;
         try {
-
+            cols = results.getMetaData().getColumnCount();
+            if (cols == 5)
+                output += "vin      driver              category        make        model       year\n\n";
+            else
+                output += "vin      average         driver              category        make        model       year\n\n";
             while (results.next()) {
-                output += results.getString("vin") + "   " + results.getString("driver") + "   " +
-                        results.getString("category") + "   " + results.getString("make") + "   " +
-                        results.getString("model") + "   " + results.getString("year");
-                if (withAverage)
-                    output += results.getString("average");
+                for (int i=1; i<=cols; i++) {
+                    output += results.getString(i) + "      ";
+                }
                 output += "\n";
-
             }
             results.close();
             return output;
@@ -54,10 +56,6 @@ public class DbCarService {
             System.err.println("Unable to print ResultSet");
             System.err.println(e.getMessage());
             throw(e);
-        }
-        finally {
-            if (results != null && !results.isClosed())
-                results.close();
         }
     }
 
@@ -100,6 +98,7 @@ public class DbCarService {
             rs = stmt.executeQuery(query);
             vinSet = attrSetToString(rs, "vin");
             rs.close();
+            System.out.println("Return set: " + vinSet);
             return vinSet;
         }
         catch(Exception e) {
@@ -150,7 +149,7 @@ public class DbCarService {
                 return catResults;
             }
             // Empty cat results
-            if (catResults.equals("()"))
+            if (catResults.equals("('')"))
                 modelQuery = "SELECT vin FROM UberCar";
             else
                 modelQuery += " model='" + model + "'";
@@ -180,8 +179,10 @@ public class DbCarService {
             andor = "OR";
         String addressQuery = "SELECT uc.vin AS vin FROM UberCar uc, UberDriver ud WHERE uc.driver=ud.login AND ud.address LIKE '%" + address + "%'";
         try {
-            if (address.length() == 0)
+            if (address.length() == 0) {
+                System.out.println("Return set: " + modelResults);
                 return modelResults;
+            }
             addressQuery += " " + andor + " uc.vin IN " + modelResults;
 
             System.out.println("Using set: " + modelResults);
@@ -222,19 +223,19 @@ public class DbCarService {
             }
 
             if (sort.equals("a")) {
-                sortQuery = "SELECT car AS vin, AVG(rating) AS average FROM CarFeedback GROUP BY car HAVING car IN " +
-                             allVins + " ORDER BY AVG(rating) DESC";
+                sortQuery = "SELECT car, AVG(rating) AS average FROM CarFeedback WHERE car IN " + allVins + " GROUP BY car ORDER BY average ASC";
+                System.out.println("Executing query: " + sortQuery);
                 sortedResults = stmt.executeQuery(sortQuery);
             }
             else if (sort.equals("b")) {
                 tuQuery = "SELECT reviewee FROM Trusts WHERE trust_score=1";
                 trustedUserResults = stmt.executeQuery(tuQuery);
                 revieweeSet = attrSetToString(trustedUserResults, "reviewee");
-                tfQuery = "SELECT car FROM CarFeedback WHERE reviewer IN " + revieweeSet;
+                tfQuery = "SELECT car FROM CarFeedback WHERE reviewer IN " + revieweeSet + " AND car IN " + allVins;
                 trustedFeedbackResults = stmt.executeQuery(tfQuery);
                 feedbackSet = attrSetToString(trustedFeedbackResults, "car");
-                sortQuery = "SELECT car AS vin, AVG(rating) AS average FROM CarFeedback GROUP BY car HAVING car IN " +
-                        feedbackSet + " ORDER BY AVG(rating) DESC";
+                sortQuery = "SELECT car, AVG(rating) AS average FROM CarFeedback WHERE car IN " + feedbackSet + " GROUP BY car ORDER BY average ASC";
+                System.out.println("Executing query: " + sortQuery);
                 sortedResults = stmt.executeQuery(sortQuery);
             }
             else {
@@ -248,9 +249,10 @@ public class DbCarService {
 
             matchedCars.populate(sortedResults);
             matchedCars.setMatchColumn(1);
+            //System.out.println(sortedDataToString(matchedCars));
             joinedRows.addRowSet(matchedCars);
 
-            allQuery = "SELECT * FROM UberCar";
+            allQuery = "SELECT uc.vin as car, uc.driver, uc.category, uc.make, uc.model, uc.year FROM UberCar uc";
             allCarResults = stmt.executeQuery(allQuery);
             allCars.populate(allCarResults);
             allCars.setMatchColumn(1);
@@ -269,7 +271,7 @@ public class DbCarService {
         String output = "";
         try {
             while (rs.next()) {
-                output += rs.getString("vin") + "   " + rs.getString("average") + "\n";
+                output += rs.getString("car") + "   " + rs.getString("average") + "\n";
             }
         }
         catch(Exception e) {
@@ -337,6 +339,8 @@ public class DbCarService {
             results = results.substring(0, results.length()-2);
         }
         results += ")";
+        if (results.equals("()"))
+            results = "('')";
         return results;
     }
 
