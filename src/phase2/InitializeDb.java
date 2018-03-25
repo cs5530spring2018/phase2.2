@@ -72,7 +72,7 @@ public class InitializeDb {
             //ResultSet rset = carService.availableCars(con.stmt, 12.15f, 3);
             //System.out.println(carService.printableAvailableCars(rset));
             ResultSet rset = carService.ucBrowser(con.stmt, "", "", "Toyota", "AND", "UT", "b");
-            System.out.println(carService.printableCars(rset, true));
+            System.out.println(carService.printableCars(rset));
         }
         catch (Exception e)
         {
