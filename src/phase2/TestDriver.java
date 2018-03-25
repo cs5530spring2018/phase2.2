@@ -18,6 +18,7 @@ public class TestDriver {
         } finally {
             try {
                 System.out.println("Closing connection");
+                con.stmt.close();
                 con.closeConnection();
             } catch (Exception e) {
                 //Don't handle errors when closing connection

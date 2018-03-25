@@ -1,5 +1,7 @@
 package phase2;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.lang.*;
 import java.sql.*;
@@ -61,6 +63,28 @@ public class InitializeDb {
 
             //System.out.println("Creating ride records");
             //makeRides(con.stmt, 100);
+
+            //System.out.println("Testing upsert");
+            //DbCarService carService = new DbCarService();
+            //carService.createUberCar(con.stmt, "abcd0", "driverUsername0", "Truck", "Ford", "F-150", 2018);
+
+
+            String sql;
+            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("please enter your query below:");
+            while ((sql = in.readLine()) == null && sql.length() == 0)
+                System.out.println(sql);
+            ResultSet rs = con.stmt.executeQuery(sql);
+            ResultSetMetaData rsmd = rs.getMetaData();
+            int numCols = rsmd.getColumnCount();
+            while (rs.next()) {
+                for (int i = 1; i <= numCols; i++) {
+                    System.out.print(rs.getString(i) + "  ");
+                }
+                System.out.println("");
+            }
+            System.out.println(" ");
+            rs.close();
         }
         catch (Exception e)
         {
@@ -73,6 +97,7 @@ public class InitializeDb {
             {
                 try
                 {
+                    con.stmt.close();
                     con.closeConnection();
                     System.out.println ("Database connection terminated");
                 }
