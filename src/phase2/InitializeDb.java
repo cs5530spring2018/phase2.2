@@ -65,10 +65,12 @@ public class InitializeDb {
             //makeRides(con.stmt, 100);
 
             //System.out.println("Testing upsert");
-            //DbCarService carService = new DbCarService();
+            DbCarService carService = new DbCarService();
             //carService.createUberCar(con.stmt, "abcd0", "driverUsername0", "Truck", "Ford", "F-150", 2018);
             //ResultSet rset = carService.availableCars(con.stmt, 12.15f, 3);
             //System.out.println(carService.printableAvailableCars(rset));
+            ResultSet rset = carService.ucBrowser(con.stmt, "Truck", "OR", "Ford", "AND", "UT", "a");
+            System.out.println(carService.sortedDataToString(rset));
 
             String sql;
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
