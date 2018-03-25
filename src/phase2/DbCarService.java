@@ -1,5 +1,10 @@
 package phase2;
 
+import com.sun.rowset.CachedRowSetImpl;
+import com.sun.rowset.JoinRowSetImpl;
+
+import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.JoinRowSet;
 import java.lang.*;
 import java.sql.*;
 import java.io.*;
@@ -29,14 +34,17 @@ public class DbCarService {
     /*
         ResultSet must have all car columns, please give it result of availableCars()
      */
-    public String printableAvailableCars(ResultSet results) throws Exception {
+    public String printableCars(ResultSet results, boolean withAverage) throws Exception {
         String output = "";
         try {
 
             while (results.next()) {
                 output += results.getString("vin") + "   " + results.getString("driver") + "   " +
                         results.getString("category") + "   " + results.getString("make") + "   " +
-                        results.getString("model") + "   " + results.getString("year") + "\n";
+                        results.getString("model") + "   " + results.getString("year");
+                if (withAverage)
+                    output += results.getString("average");
+                output += "\n";
 
             }
             results.close();
@@ -81,13 +89,18 @@ public class DbCarService {
         }
     }
 
-    private ResultSet categoryQuery(Statement stmt, String category) throws Exception {
+    private String categoryQuery(Statement stmt, String category) throws Exception {
         String query = "SELECT vin FROM UberCar";
+        ResultSet rs;
+        String vinSet = "";
         try {
             if (category.length() != 0) {
                 query += " WHERE category='" + category + "'";
             }
-            return stmt.executeQuery(query);
+            rs = stmt.executeQuery(query);
+            vinSet = attrSetToString(rs, "vin");
+            rs.close();
+            return vinSet;
         }
         catch(Exception e) {
             System.err.println("Unable to execute query:"+query+"\n");
@@ -126,25 +139,31 @@ public class DbCarService {
         }
     }
 
-    private ResultSet modelAggregateQuery(Statement stmt, ResultSet catResults, String model, String andor) throws Exception {
+    private String modelAggregateQuery(Statement stmt, String catResults, String model, String andor) throws Exception {
         ResultSet modelResults;
         String modelQuery = "SELECT vin FROM UberCar WHERE";
-        String vinSet = attrSetToString(catResults, "vin");
+        String modelResultsStr = "";
 
         try {
-            if (catResults.isBeforeFirst() && model.length() == 0) {
+            if (model.length() == 0) {
+                System.out.println("Returning set: " + catResults);
                 return catResults;
             }
-            if (model.length() == 0 && !catResults.isBeforeFirst())
+            // Empty cat results
+            if (catResults.equals("()"))
                 modelQuery = "SELECT vin FROM UberCar";
-            if (model.length() != 0)
+            else
                 modelQuery += " model='" + model + "'";
             if (andor.length() != 0) {
-                modelQuery += " " + andor + " vin IN " + vinSet;
+                modelQuery += " " + andor + " vin IN " + catResults;
 
             }
+            System.out.println("Using set: " + catResults);
+            System.out.println("Executing: " + modelQuery);
             modelResults = stmt.executeQuery(modelQuery);
-            return modelResults;
+            modelResultsStr = attrSetToString(modelResults, "vin");
+            modelResults.close();
+            return modelResultsStr;
         }
         catch(Exception e) {
             System.err.println("Unable to execute query:"+modelQuery+"\n");
@@ -153,21 +172,24 @@ public class DbCarService {
         }
     }
 
-    private ResultSet addressAggregateQuery(Statement stmt, ResultSet modelResults, String address, String andor) throws Exception {
+    private String addressAggregateQuery(Statement stmt, String modelResults, String address, String andor) throws Exception {
         ResultSet addressResults;
-        String vinSet = attrSetToString(modelResults, "vin");
+        String addressResultsStr;
+
         if (andor.length() == 0)
-            andor = "AND";
+            andor = "OR";
         String addressQuery = "SELECT uc.vin AS vin FROM UberCar uc, UberDriver ud WHERE uc.driver=ud.login AND ud.address LIKE '%" + address + "%'";
         try {
             if (address.length() == 0)
                 return modelResults;
-            addressQuery += " " + andor + " uc.vin IN " + vinSet;
+            addressQuery += " " + andor + " uc.vin IN " + modelResults;
 
-            if (!modelResults.isClosed())
-                modelResults.close();
+            System.out.println("Using set: " + modelResults);
+            System.out.println("Executing: " + addressQuery);
             addressResults = stmt.executeQuery(addressQuery);
-            return addressResults;
+            addressResultsStr = attrSetToString(addressResults, "vin");
+            addressResults.close();
+            return addressResultsStr;
         }
         catch(Exception e) {
             System.err.println("Unable to execute query:"+addressQuery+"\n");
@@ -176,29 +198,33 @@ public class DbCarService {
         }
     }
 
-    private ResultSet sortAggregatedVinResults(Statement stmt, ResultSet allVins, String sort) throws Exception {
-        /*
-        select car, avg(rating) from CarFeedback
-            group by car
-                having car in ('abcd0', 'abcd1', 'abcd77');
-         */
+    private ResultSet sortAggregatedVinResults(Statement stmt, String allVins, String sort) throws Exception {
+        ResultSet allCarResults;
         ResultSet sortedResults;
         ResultSet trustedUserResults;
         ResultSet trustedFeedbackResults;
-        String vinSet = attrSetToString(allVins, "vin");
+        JoinRowSet joinedRows = new JoinRowSetImpl();
+        CachedRowSet allCars = new CachedRowSetImpl();
+        CachedRowSet matchedCars = new CachedRowSetImpl();
+
         String revieweeSet;
         String feedbackSet;
+        String allQuery = "";
         String sortQuery = "";
         String tuQuery = "";
         String tfQuery = "";
-        if (sort.length() == 0)
-            return allVins;
+
         try {
+            if (sort.length() == 0) {
+                // No sort, return all car data
+                sortQuery = "SELECT * FROM UberCar WHERE vin IN " + allVins;
+                return stmt.executeQuery(sortQuery);
+            }
+
             if (sort.equals("a")) {
                 sortQuery = "SELECT car AS vin, AVG(rating) AS average FROM CarFeedback GROUP BY car HAVING car IN " +
-                             vinSet + " ORDER BY AVG(rating) DESC";
+                             allVins + " ORDER BY AVG(rating) DESC";
                 sortedResults = stmt.executeQuery(sortQuery);
-                return sortedResults;
             }
             else if (sort.equals("b")) {
                 tuQuery = "SELECT reviewee FROM Trusts WHERE trust_score=1";
@@ -210,13 +236,27 @@ public class DbCarService {
                 sortQuery = "SELECT car AS vin, AVG(rating) AS average FROM CarFeedback GROUP BY car HAVING car IN " +
                         feedbackSet + " ORDER BY AVG(rating) DESC";
                 sortedResults = stmt.executeQuery(sortQuery);
-                return sortedResults;
             }
             else {
                 Exception e = new Exception();
                 System.err.println("Sort type invalid: " + sort);
                 throw(e);
             }
+            // Join the results with all cars
+            if (!sortedResults.isBeforeFirst())
+                return sortedResults;
+
+            matchedCars.populate(sortedResults);
+            matchedCars.setMatchColumn(1);
+            joinedRows.addRowSet(matchedCars);
+
+            allQuery = "SELECT * FROM UberCar";
+            allCarResults = stmt.executeQuery(allQuery);
+            allCars.populate(allCarResults);
+            allCars.setMatchColumn(1);
+            joinedRows.addRowSet(allCars);
+
+            return joinedRows;
         }
         catch(Exception e) {
             System.err.println("Unable to execute query:"+sortQuery+"\n");
@@ -262,12 +302,10 @@ public class DbCarService {
         //return
     } */
     public ResultSet ucBrowser(Statement stmt, String category, String andor1, String model, String andor2, String address, String sort) throws Exception {
-        ResultSet categoryResults = categoryQuery(stmt, category);
-        ResultSet modelResults = modelAggregateQuery(stmt, categoryResults, model, andor1);
-        ResultSet addrResults = addressAggregateQuery(stmt, modelResults, address, andor2);
-        if (!addrResults.isBeforeFirst()) {
-            return addrResults;
-        }
+        String categoryResults = categoryQuery(stmt, category);
+        String modelResults = modelAggregateQuery(stmt, categoryResults, model, andor1);
+        String addrResults = addressAggregateQuery(stmt, modelResults, address, andor2);
+
         ResultSet sortedResults = sortAggregatedVinResults(stmt, addrResults, sort);
         return sortedResults;
     }
