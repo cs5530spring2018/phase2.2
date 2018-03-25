@@ -1,6 +1,7 @@
 package phase2;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.util.*;
 import java.lang.*;
@@ -21,18 +22,19 @@ public class InitializeDb {
         Connector2 con = null;
         ResultSet results;
 
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Enter server hostname: ");
-        hostname = sc.next();
-        System.out.println("Enter username: ");
-        username = sc.next();
-        System.out.println("Enter password: ");
-        password = sc.next();
-        System.out.println("Enter db name: ");
-        dbName = sc.next();
 
         try
         {
+
+            File dbCreds = new File("resources/dbCreds");
+            Scanner sc = new Scanner(dbCreds);
+
+            hostname = sc.next();
+            username = sc.next();
+            password = sc.next();
+            dbName = sc.next();
+
+
             //remember to replace the password
             con= new Connector2(hostname, username, password, dbName);
             //System.out.println ("Database connection established");
@@ -69,25 +71,8 @@ public class InitializeDb {
             //carService.createUberCar(con.stmt, "abcd0", "driverUsername0", "Truck", "Ford", "F-150", 2018);
             //ResultSet rset = carService.availableCars(con.stmt, 12.15f, 3);
             //System.out.println(carService.printableAvailableCars(rset));
-            ResultSet rset = carService.ucBrowser(con.stmt, "", "", "", "", "UT", "b");
-            System.out.println(carService.sortedDataToString(rset));
-
-            String sql;
-            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("please enter your query below:");
-            while ((sql = in.readLine()) == null && sql.length() == 0)
-                System.out.println(sql);
-            ResultSet rs = con.stmt.executeQuery(sql);
-            ResultSetMetaData rsmd = rs.getMetaData();
-            int numCols = rsmd.getColumnCount();
-            while (rs.next()) {
-                for (int i = 1; i <= numCols; i++) {
-                    System.out.print(rs.getString(i) + "  ");
-                }
-                System.out.println("");
-            }
-            System.out.println(" ");
-            rs.close();
+            ResultSet rset = carService.ucBrowser(con.stmt, "", "", "Toyota", "AND", "UT", "b");
+            System.out.println(carService.printableCars(rset, true));
         }
         catch (Exception e)
         {
