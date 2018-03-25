@@ -33,34 +33,34 @@ public class InitializeDb {
         {
             //remember to replace the password
             con= new Connector2(hostname, username, password, dbName);
-            System.out.println ("Database connection established");
-            System.out.println("Making users and drivers...");
-            makeUberUsers(con.stmt, 100);
-            makeUberDrivers(con.stmt, 100);
+            //System.out.println ("Database connection established");
+            //System.out.println("Making users and drivers...");
+            //makeUberUsers(con.stmt, 100);
+            //makeUberDrivers(con.stmt, 100);
 
-            System.out.println("Creating vehicles...");
-            makeUberCars(con.stmt, 100);
+            //System.out.println("Creating vehicles...");
+            //makeUberCars(con.stmt, 100);
 
-            System.out.println("Creating car feedback...");
-            makeCarFeedback(con.stmt, 100);
+            //System.out.println("Creating car feedback...");
+            //makeCarFeedback(con.stmt, 100);
 
-            System.out.println("Creating feedback scores...");
-            makeFeebackScores(con.stmt, 100);
+            //System.out.println("Creating feedback scores...");
+            //makeFeebackScores(con.stmt, 100);
 
-            System.out.println("Creating trust records...");
-            makeTrustRecords(con.stmt, 100);
+            //System.out.println("Creating trust records...");
+            //makeTrustRecords(con.stmt, 100);
 
-            System.out.println("Creating favorites...");
-            makeFavorites(con.stmt, 100);
+            //System.out.println("Creating favorites...");
+            //makeFavorites(con.stmt, 100);
 
-            System.out.println("Creating hours of ops...");
-            makeHoursOfOp(con.stmt, 100);
+            //System.out.println("Creating hours of ops...");
+            //makeHoursOfOp(con.stmt, 100);
 
-            System.out.println("Creating reservation records");
-            makeReservations(con.stmt, 100);
+            //System.out.println("Creating reservation records");
+            //makeReservations(con.stmt, 100);
 
-            System.out.println("Creating ride records");
-            makeRides(con.stmt, 100);
+            //System.out.println("Creating ride records");
+            //makeRides(con.stmt, 100);
         }
         catch (Exception e)
         {
@@ -241,16 +241,15 @@ public class InitializeDb {
         DbHoursOfOpService service = new DbHoursOfOpService();
         String driver = "driverUsername";
         String temp_driver;
-        Date start = new Date();
-        Date finish = new Date();
+        float start = 12.00f;
+        float finish;
+
         int day;
-        long ms = start.getTime();
 
         for (int i=0; i<numRecords; i++) {
             day = i % 7;
+            finish = day + 1.15f;
             temp_driver = driver + Integer.toString(i);
-            ms += 1000000;
-            finish.setTime(ms);
             service.createHoursOfOp(stmt, temp_driver, start, finish, day);
         }
     }
