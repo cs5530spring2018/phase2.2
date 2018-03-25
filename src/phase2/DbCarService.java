@@ -31,24 +31,60 @@ public class DbCarService {
         }
     }
 
+    public void removeUberCar(Statement stmt, String vin) throws Exception {
+        String query;
+        try {
+            query = "DELETE FROM UberCar WHERE vin='" + vin + "'";
+            System.out.println("Removing car with vin: " + vin);
+            int success = stmt.executeUpdate(query);
+            if(success > 0) {
+                System.out.println("Successfully removed car with vin: " + vin);
+            } else {
+                System.out.println("Car with vin: " + vin + " could not be found.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Could not delete UberCar with vin: " + vin);
+        }
+    }
+
+    public String fetchUberCars(Statement stmt, String driver) throws Exception{
+        String query;
+        try {
+            query = "SELECT * FROM UberCar WHERE driver='" + driver + "'";
+            System.out.println("Fetching all cars for driver: " + driver);
+            ResultSet res = stmt.executeQuery(query);
+            return printableCars(res);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Could not fetch UberCars for user: " + driver);
+            throw (e);
+        }
+    }
+
     /*
         ResultSet must have all car columns, please give it result of availableCars()
      */
-    public String printableCars(ResultSet results, boolean withAverage) throws Exception {
+    public String printableCars(ResultSet results) throws Exception {
         String output = "";
         int cols;
         try {
             cols = results.getMetaData().getColumnCount();
-            if (cols == 5)
-                output += "vin      driver              category        make        model       year\n\n";
-            else
-                output += "vin      average         driver              category        make        model       year\n\n";
-            while (results.next()) {
-                for (int i=1; i<=cols; i++) {
-                    output += results.getString(i) + "      ";
+            if (cols == 6) {
+                while (results.next()) {
+                    output += "vin: " + results.getString("vin") + "    driver: " + results.getString("driver") +
+                            "    category: " + results.getString("category") + "    make: " + results.getString("make") +
+                            "    model: " + results.getString("model") + "    year: " + results.getString("year") + "\n";
                 }
-                output += "\n";
+            } else {
+                while (results.next()) {
+                    output += "vin: " + results.getString("vin") + "    average: " + results.getString("average") +
+                            "    driver: " + results.getString("driver") + "    category: " + results.getString("category") +
+                            "    make: " + results.getString("make") + "    model: " + results.getString("model") +
+                            "    year: " + results.getString("year") + "\n";
+                }
             }
+
             results.close();
             return output;
         }

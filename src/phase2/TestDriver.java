@@ -235,10 +235,9 @@ public class TestDriver {
         String choice;
         //driverLandingMenu structure
         System.out.println("         You are logged in as a Driver         ");
-        System.out.println("1. add or update car");
-        System.out.println("2. remove car");
-        System.out.println("3. add or update hours of operation");
-        System.out.println("4. log out");
+        System.out.println("1. your UberCar menu");
+        System.out.println("2. your hours of operation menu");
+        System.out.println("3. log out");
         System.out.println("please enter your choice:");
 
         while ((choice = in.readLine()) == null && choice.length() == 0) ;
@@ -246,14 +245,12 @@ public class TestDriver {
         switch (choice){
             case "1":
                 //TODO: add or update car menu
+                driverUberCarMenu();
                 break;
             case "2":
-                //TODO: remove car menu
-                break;
-            case "3":
                 //TODO: add/update hours of operation
                 break;
-            case "4":
+            case "3":
                 logOut();
                 break;
             default:
@@ -261,6 +258,119 @@ public class TestDriver {
                 driverLandingMenu();
                 break;
         }
+    }
+
+    private static void driverUberCarMenu() throws Exception {
+        DbCarService service = new DbCarService();
+        String choice;
+        String vin;
+        System.out.println("          UberCar Menu:          ");
+        System.out.println("1. view your cars");
+        System.out.println("2. add/update a car");
+        System.out.println("3. remove existing car");
+        System.out.println("4. leave UberCar Menu");
+        System.out.println("please enter your choice:");
+
+        while ((choice = in.readLine()) == null && choice.length() == 0);
+
+        switch (choice) {
+            case "1":
+                //TODO: execute search query
+                System.out.println(service.fetchUberCars(con.stmt, loggedInUsername));
+                driverUberCarMenu();
+                break;
+            case "2":
+                upsertCar();
+                break;
+            case "3":
+                System.out.println("Enter Vin # of the car you want to remove (or type '!c' to cancel):");
+                while ((vin = in.readLine()) == null && vin.length() == 0);
+                if(isCancelCarMenu(vin)) { return; }
+                service.removeUberCar(con.stmt, vin);
+                driverUberCarMenu();
+                break;
+            case "4":
+                driverLandingMenu();
+                break;
+            default:
+                System.out.println("Invalid Selection...");
+                driverUberCarMenu();
+        }
+    }
+    private static void upsertCar() throws Exception {
+        DbCarService service = new DbCarService();
+
+        String vin;
+        String category = "invalid";
+        String make;
+        String model;
+        String year ;
+        int yearConverted = 0;
+
+        System.out.println("          Add/Update UberCar          ");
+
+        System.out.println("Enter Vin # of your car (or type '!c' to cancel):");
+        while ((vin = in.readLine()) == null && vin.length() == 0);
+        if(isCancelCarMenu(vin)) { return; }
+
+        while(category.equals("invalid")) {category = selectCategory(); }
+        if(isCancelCarMenu(category)) { return; }
+
+        System.out.println("Enter the make of your car (or type '!c' to cancel):");
+        while ((make = in.readLine()) == null && make.length() == 0);
+        if(isCancelCarMenu(make)) { return; }
+
+        System.out.println("Enter the model of your car (or type '!c' to cancel):");
+        while ((model = in.readLine()) == null && model.length() == 0);
+        if(isCancelCarMenu(model)) { return; }
+
+        System.out.println("Enter the year of your car (or type '!c' to cancel):");
+        while ((year = in.readLine()) == null && year.length() == 0);
+        if(isCancelCarMenu(year)) { return; }
+
+        try{
+            yearConverted = Integer.parseInt(year);
+        } catch (Exception e) {
+            System.out.println("Could not parse year to int.");
+        }
+
+        service.createUberCar(con.stmt, vin, loggedInUsername, category, make, model, yearConverted);
+        driverUberCarMenu();
+    }
+
+    private static String selectCategory() throws Exception {
+        String choice;
+        System.out.println("Select a category:");
+        System.out.println("1. economy");
+        System.out.println("2. comfort");
+        System.out.println("3. luxury");
+        System.out.println("4. quit adding car");
+        System.out.println("please enter your choice:");
+
+        while ((choice = in.readLine()) == null && choice.length() == 0);
+
+        switch (choice) {
+            case "1":
+                return "economy";
+            case "2":
+                return "comfort";
+            case "3":
+                return "luxury";
+            case "4":
+                return "!c";
+            default:
+                System.out.println("Invalid Selection...");
+                return "invalid";
+        }
+    }
+
+    private static boolean isCancelCarMenu(String input) throws Exception{
+        if(input.toLowerCase().trim().equals("!c")) {
+            System.out.println("Cancelled...");
+            driverUberCarMenu();
+            return true;
+        }
+        return false;
     }
 
     private static void userLandingMenu() throws Exception {
@@ -327,11 +437,12 @@ public class TestDriver {
     }
 
     private static void browseCars() throws Exception{
-        DbUserService service = new DbUserService();
+        DbCarService service = new DbCarService();
 
         String category = "invalid";
         String model = "invalid";
         String address = "invalid";
+        String andOrs = "invalid";
 
         System.out.println("          UberCar Browsing          ");
         while(category.equals("invalid")) {category = browseCarCategory(); }
@@ -343,8 +454,12 @@ public class TestDriver {
         while(address.equals("invalid")) {address = browseCarAddress(); }
         if(isCancelBrowseCars(address)) { return; }
 
-        browseCarAndOrExecute(category, model, address);
+        while(andOrs.equals("invalid")) { andOrs = browseCarAndOr(category, model, address); }
+        if(isCancelBrowseCars(andOrs)) { return; }
 
+        String[] andOrsSplit = andOrs.split("/");
+
+        //TODO: Make the service call passing in params [display results]
 
     }
 
@@ -370,15 +485,14 @@ public class TestDriver {
             case "4":
                 return "";
             case "5":
-                return "c";
+                return "!c";
             default:
                 System.out.println("Invalid Selection...");
-                browseCarCategory();
                 return "invalid";
         }
     }
 
-    private static void browseCarAndOrExecute(String category, String model, String address) throws Exception {
+    private static String browseCarAndOr(String category, String model, String address) throws Exception {
         String choice;
         String displayCategory = category.isEmpty() ? "any category" : category;
         String displayModel = model.isEmpty() ? "any model" : model;
@@ -386,8 +500,8 @@ public class TestDriver {
         System.out.println("Select how to combine your filters:");
         System.out.println("1. " + displayCategory + " AND is a(n) " + displayModel + " AND is in " + displayAddress);
         System.out.println("2. " + displayCategory + " AND is a(n) " + displayModel + " OR is in " + displayAddress);
-        System.out.println("3. " + displayCategory + " OR is a(n) " + displayModel + " OR is in " + displayAddress);
-        System.out.println("4. " + displayCategory + " AND is in " + displayAddress + " OR is a(n)" + displayModel);
+        System.out.println("3. " + displayCategory + " OR is a(n) " + displayModel + " AND is in " + displayAddress);
+        System.out.println("4. " + displayCategory + " OR is a(n) " + displayModel + " OR is in " + displayAddress);
         System.out.println("5. quit browsing");
         System.out.println("please enter your choice:");
 
@@ -395,19 +509,18 @@ public class TestDriver {
 
         switch (choice) {
             case "1":
-                break;
+                return "and/and";
             case "2":
-                break;
+                return "and/or";
             case "3":
-                break;
+                return "or/and";
             case "4":
-                break;
+                return "or/or";
             case "5":
-                userLandingMenu();
-                return;
+                return "!c";
             default:
                 System.out.println("Invalid Selection...");
-                browseCarCategory();
+                return "invalid";
         }
     }
 
@@ -430,10 +543,9 @@ public class TestDriver {
             case "2":
                 return "";
             case "3":
-                return "c";
+                return "!c";
             default:
                 System.out.println("Invalid Selection...");
-                browseCarModel();
                 return "invalid";
         }
 
@@ -458,22 +570,22 @@ public class TestDriver {
             case "2":
                 return "";
             case "3":
-                return "c";
+                return "!c";
             default:
                 System.out.println("Invalid Selection...");
-                browseCarAddress();
                 return "invalid";
         }
     }
     /**Helper method for when user wants to cancel while browsing cars*/
     private static boolean isCancelBrowseCars(String input) throws Exception{
-        if(input.toLowerCase().trim().equals("c")) {
+        if(input.toLowerCase().trim().equals("!c")) {
             System.out.println("Browsing cancelled...");
             userLandingMenu();
             return true;
         }
         return false;
     }
+
     private static void logOut() throws Exception{
         loggedInIsDriver = false;
         loggedInUsername = "";
