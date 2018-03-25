@@ -244,7 +244,6 @@ public class TestDriver {
 
         switch (choice){
             case "1":
-                //TODO: add or update car menu
                 driverUberCarMenu();
                 break;
             case "2":
@@ -276,7 +275,7 @@ public class TestDriver {
         switch (choice) {
             case "1":
                 //TODO: execute search query
-                System.out.println(service.fetchUberCars(con.stmt, loggedInUsername));
+                System.out.println(service.printableCars(service.fetchUberCars(con.stmt, loggedInUsername)));
                 driverUberCarMenu();
                 break;
             case "2":
@@ -297,6 +296,7 @@ public class TestDriver {
                 driverUberCarMenu();
         }
     }
+
     private static void upsertCar() throws Exception {
         DbCarService service = new DbCarService();
 
@@ -443,6 +443,7 @@ public class TestDriver {
         String model = "invalid";
         String address = "invalid";
         String andOrs = "invalid";
+        String sort = "invalid";
 
         System.out.println("          UberCar Browsing          ");
         while(category.equals("invalid")) {category = browseCarCategory(); }
@@ -459,11 +460,40 @@ public class TestDriver {
 
         String[] andOrsSplit = andOrs.split("/");
 
-        //TODO: Make the service call passing in params [display results]
+        while(sort.equals("invalid")) { sort = browseCarSort(); }
+        if(isCancelBrowseCars(sort)) { return; }
 
+        System.out.println("          Browsing Results         ");
+        System.out.println(service.printableCars(service.ucBrowser(con.stmt, category, andOrsSplit[0], model, andOrsSplit[1], address, sort)));
+        userLandingMenu();
     }
 
-    private static String browseCarCategory() throws Exception{
+    private static String browseCarSort() throws Exception {
+        String choice;
+        System.out.println("Select sorting method:");
+        System.out.println("1. sort by average score of reviews");
+        System.out.println("2. sort by average score of reviews left by trusted users");
+        System.out.println("3. do not sort");
+        System.out.println("4. quit browsing");
+
+        while ((choice = in.readLine()) == null && choice.length() == 0);
+
+        switch (choice) {
+            case "1":
+                return "a";
+            case "2":
+                return "b";
+            case "3":
+                return "";
+            case "4":
+                return "!c";
+            default:
+                System.out.println("Invalid Selection...");
+                return "invalid";
+        }
+
+    }
+    private static String browseCarCategory() throws Exception {
         String choice;
         System.out.println("Select a category:");
         System.out.println("1. economy");
