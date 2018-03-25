@@ -54,16 +54,23 @@ public class DbUserService {
     }
 
     public boolean attemptToLogIn(Statement stmt, String login, String password, String table) throws Exception {
-        ResultSet results;
+        ResultSet results = null;
+        boolean noRecord;
         String query = "SELECT uu.login, uu.password FROM " + table + " uu WHERE uu.login='" + login + "' AND uu.password='" + password + "'";
         try {
             results = stmt.executeQuery(query);
-            return results.isBeforeFirst();
+            noRecord = results.isBeforeFirst();
+            results.close();
+            return noRecord;
         }
         catch(Exception e) {
             System.err.println("Unable to execute query:"+query+"\n");
             System.err.println(e.getMessage());
             throw(e);
+        }
+        finally {
+            if (results != null && !results.isClosed())
+                results.close();
         }
     }
     public boolean isLoginAvailable(Statement stmt, String login, String table) throws Exception {
@@ -79,16 +86,23 @@ public class DbUserService {
 
     private boolean checkNameAvailable(Statement stmt, String login, String table) throws Exception {
         // Look up user first and see if they already exist
-        ResultSet results;
+        ResultSet results = null;
+        boolean nameAvailable;
         String query = "SELECT uu.login FROM " + table + " uu WHERE uu.login='" + login + "'";
         try {
             results = stmt.executeQuery(query);
-            return !results.isBeforeFirst();
+            nameAvailable = !results.isBeforeFirst();
+            results.close();
+            return nameAvailable;
         }
         catch(Exception e) {
             System.err.println("Unable to execute query:"+query+"\n");
             System.err.println(e.getMessage());
             throw(e);
+        }
+        finally {
+            if (results != null && !results.isClosed())
+                results.close();
         }
     }
 
