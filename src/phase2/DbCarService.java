@@ -13,7 +13,9 @@ public class DbCarService {
 
         try {
             query = "INSERT INTO UberCar (vin, driver, category, make, model, year)" +
-                    " VALUES ('" + vin + "', '" + driver + "', '" + category + "', '" + make + "', '" + model + "', '" + Integer.toString(year)  + "')";
+                    " VALUES ('" + vin + "', '" + driver + "', '" + category + "', '" + make + "', '" + model + "', '" + Integer.toString(year)  + "')" +
+                    " ON DUPLICATE KEY UPDATE vin='" + vin + "' driver='" + driver + "'," + " category='" + category + "'," +
+                    " make='" + make + "'," + " model='" + model + "'," + " year='" + Integer.toString(year) + "'";
 
             stmt.execute(query);
         }
