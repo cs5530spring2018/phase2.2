@@ -1,6 +1,7 @@
 package phase2;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -8,11 +9,15 @@ import java.util.Scanner;
 
 public class TestDriver {
     private static Connector2 con = null;
+    private static  BufferedReader in;
+    /*Global app data*/
+    private static String loggedInUsername;
+    private static boolean loggedInIsDriver;
 
     public static void main(String[] args) {
         try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-            connectToDB(in);
+            in = new BufferedReader(new InputStreamReader(System.in));
+            connectToDB();
         } catch (Exception e) {
             System.out.println("Something went wrong");
         } finally {
@@ -26,27 +31,24 @@ public class TestDriver {
         }
     }
 
-    //TODO: Bypass this step eventually
-    private static void connectToDB(BufferedReader in) throws Exception {
+    private static void connectToDB() throws Exception {
         String hostname;
         String username;
         String password;
         String dbName;
 
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Enter server hostname: ");
+        File dbCreds = new File("resources/dbCreds");
+        Scanner sc = new Scanner(dbCreds);
+
         hostname = sc.next();
-        System.out.println("Enter username: ");
         username = sc.next();
-        System.out.println("Enter password: ");
         password = sc.next();
-        System.out.println("Enter db name: ");
         dbName = sc.next();
 
         try {
             con = new Connector2(hostname, username, password, dbName);
             System.out.println("Database connection established");
-            mainMenu(in);
+            mainMenu();
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Error while attempting to connect to database.");
@@ -54,7 +56,7 @@ public class TestDriver {
         }
     }
 
-    private static void registerMenu(BufferedReader in) throws Exception {
+    private static void registerMenu() throws Exception {
         String choice;
         System.out.println("        Select Account Type     ");
         System.out.println("1. driver");
@@ -65,22 +67,22 @@ public class TestDriver {
 
         switch (choice) {
             case "1":
-                registerUser(in, "UberDriver");
+                registerUser("UberDriver");
                 break;
             case "2":
-                registerUser(in, "UberUser");
+                registerUser("UberUser");
                 break;
             case "3":
-                mainMenu(in);
+                mainMenu();
                 break;
             default:
                 System.out.println("Invalid Selection...");
-                registerMenu(in);
+                registerMenu();
                 break;
         }
     }
 
-    private static void mainMenu(BufferedReader in) throws Exception {
+    private static void mainMenu() throws Exception {
         String choice;
         String sql;
         try {
@@ -109,17 +111,17 @@ public class TestDriver {
                     con.stmt.close();
                     return;
                 case "2":
-                    loginMenu(in, "UberDriver");
+                    loginMenu("UberDriver");
                     break;
                 case "3":
-                    loginMenu(in, "UberUser");
+                    loginMenu("UberUser");
                     break;
                 case "4":
-                    registerMenu(in);
+                    registerMenu();
                     break;
                 default:
                     System.out.println("Invalid Selection...");
-                    mainMenu(in);
+                    mainMenu();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -138,7 +140,7 @@ public class TestDriver {
         System.out.println("please enter your choice:");
     }
 
-    private static void loginMenu(BufferedReader in, String table) throws Exception {
+    private static void loginMenu(String table) throws Exception {
         DbUserService service = new DbUserService();
         String login;
         String password;
@@ -150,26 +152,14 @@ public class TestDriver {
         if (service.attemptToLogIn(con.stmt, login, password, table)) {
             //TODO: Redirect to appropriate login landing page. Save login credentials globally?
             System.out.println("Login Successful. Welcome " + login);
+            loggedInUsername = login;
+            loggedInIsDriver = table.equals("UberDriver");
         } else {
             System.out.println("Invalid Credentials");
         }
     }
 
-    /*private static void logIn(Statement stmt, BufferedReader in, String table) throws Exception {
-        DbUserService service = new DbUserService();
-        String login;
-        String password;
-        System.out.println("Enter your username:");
-        while((login = in.readLine()) == null && login.length() == 0 );
-        System.out.println("Enter your password:");
-        while ((password = in.readLine()) == null && password.length() == 0);
-        if(service.attemptToLogIn(stmt, login, password, table)){
-            //TODO: Redirect to appropriate login landing page
-        }
-
-    }*/
-
-    private static void registerUser(BufferedReader in, String table) throws Exception {
+    private static void registerUser(String table) throws Exception {
         DbUserService service = new DbUserService();
         String login = null;
         String password;
@@ -196,7 +186,7 @@ public class TestDriver {
         System.out.println("Enter a phone number:");
         while ((phone = in.readLine()) == null && phone.length() == 0) ;
         service.createUser(con.stmt, login, password, name, address, phone, table);
-        mainMenu(in); //TODO: For now we redirect back to the main menu after registering
+        mainMenu(); //TODO: For now we redirect back to the main menu after registering
     }
 
 }
