@@ -152,7 +152,8 @@ public class DbCarService {
             if (catResults.equals("('')"))
                 modelQuery = "SELECT vin FROM UberCar";
             else
-                modelQuery += " model='" + model + "'";
+                modelQuery += " model LIKE '%" + model + "%'" + " OR" +
+                        " make LIKE '%" + model + "%'";
             if (andor.length() != 0) {
                 modelQuery += " " + andor + " vin IN " + catResults;
 
