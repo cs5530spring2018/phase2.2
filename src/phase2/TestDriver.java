@@ -575,7 +575,7 @@ public class TestDriver {
                 userLandingMenu();
                 break;
             case "9":
-                //TODO: return degrees of separation
+                degreeMenu();
                 userLandingMenu();
                 break;
             case "10":
