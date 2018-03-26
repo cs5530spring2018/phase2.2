@@ -532,7 +532,7 @@ public class TestDriver {
         System.out.println("2. reserve a ride for later");
         System.out.println("3. browse cars");
         System.out.println("4. declare a car as your favorite");
-        System.out.println("5. leave a review for a car");
+        System.out.println("5. open reviews menu");
         System.out.println("6. score someone else's review");
         System.out.println("7. view most useful reviews");
         System.out.println("8. declare other users as (un)trustworthy");
@@ -545,15 +545,15 @@ public class TestDriver {
 
         switch (choice){
             case "1":
-                //TODO: find a ride menu w/confirmation
+                //find a ride menu w/confirmation
                 findRide(false);
                 break;
             case "2":
-                //TODO: reserve a car menu w/ confirmation
+                //reserve a car menu w/ confirmation
                 findRide(true);
                 break;
             case "3":
-                //TODO: browse cars menu
+                //browse cars menu
                 browseCars();
                 break;
             case "4":
@@ -561,6 +561,7 @@ public class TestDriver {
                 break;
             case "5":
                 //TODO: review a car menu
+                reviewMenu();
                 break;
             case "6":
                 //TODO: score someone's review menu
@@ -589,6 +590,118 @@ public class TestDriver {
         }
     }
 
+    private static void reviewMenu() throws Exception {
+        DbCarFeedbackService carFeedbackService = new DbCarFeedbackService();
+        String choice;
+        String vin;
+        System.out.println("          Review Menu:          ");
+        System.out.println("1. view a car's reviews");
+        System.out.println("2. leave a review for a car");
+        System.out.println("3. score someone's review");
+        System.out.println("4. view most useful reviews");
+        System.out.println("5. leave Review Menu");
+        System.out.println("please enter your choice:");
+
+        while ((choice = in.readLine()) == null && choice.length() == 0);
+
+        switch (choice) {
+            case "1":
+                System.out.println("Enter Vin # of the car whose reviews you want to see (or type '!c' to cancel):");
+                while ((vin = in.readLine()) == null && vin.length() == 0);
+                if(isCancelReview(vin)) { return; }
+                System.out.println(carFeedbackService.printFeedBack(carFeedbackService.fetchFeedbackForCar(con.stmt, vin)));
+                reviewMenu();
+                break;
+            case "2":
+                reviewCar();
+                break;
+            case "3":
+                scoreCarReview();
+                break;
+            case "4":
+                break;
+            case "5":
+                userLandingMenu();
+                break;
+            default:
+                System.out.println("Invalid Selection...");
+                reviewMenu();
+        }
+    }
+
+    private static void topNReviewsForDriver(){
+        DbCarFeedbackService service = new DbCarFeedbackService();
+        String driver;
+        String numResults;
+        System.out.println("Get the top N reviews ");
+    }
+    private static void reviewCar() throws Exception{
+        DbCarFeedbackService service = new DbCarFeedbackService();
+        String vin;
+        String rating;
+        String comment;
+        System.out.println("Review a car:");
+        System.out.println("Enter Vin # of the car you want to review (or type '!c' to cancel):");
+        while ((vin = in.readLine()) == null && vin.length() == 0);
+        if(isCancelReview(vin)) { return; }
+
+        System.out.println("Enter a rating (0-10 where 0 is terrible, 10 is excellent) (or type '!c' to cancel):");
+        while ((rating = in.readLine()) == null && rating.length() == 0);
+        if(isCancelReview(rating)) { return; }
+
+        System.out.println("[Optional] leave a comment (max 255 characters) or leave blank (or type '!c' to cancel):");
+        while ((comment = in.readLine()) == null && comment.length() == 0);
+        if(isCancelReview(comment)) { return; }
+
+        try{
+            service.createCarFeedback(con.stmt, loggedInUsername, vin, Integer.parseInt(rating), comment, LocalDateTime.now());
+        } catch (Exception e) {
+            System.err.println("Invalid input for review!");
+            reviewMenu();
+        }
+        reviewMenu();
+    }
+
+    private static void scoreCarReview() throws  Exception {
+        DbScoredFeedbackService service = new DbScoredFeedbackService();
+        String vin;
+        String reviewee;
+        String score;
+        System.out.println("Score a review:");
+        System.out.println("Enter Vin # of the car in the review you want to score (or type '!c' to cancel):");
+        while ((vin = in.readLine()) == null && vin.length() == 0);
+        if(isCancelReview(vin)) { return; }
+
+        System.out.println("Enter the name of user who left the review you want to score (or type '!c' to cancel):");
+        while ((reviewee = in.readLine()) == null && reviewee.length() == 0);
+        if(isCancelReview(reviewee)) { return; }
+        if(reviewee.equals(loggedInUsername)){
+            System.out.println("You cannot score your own review!");
+            reviewMenu();
+            return;
+        }
+
+        System.out.println("Enter the score for the review (0, 1, or 2 where 0 is 'useless', 1 is 'useful', 2 is 'very useful') (or type '!c' to cancel):");
+        while ((score = in.readLine()) == null && score.length() == 0);
+        if(isCancelReview(score)) { return; }
+
+        try {
+            service.createScoredFeedback(con.stmt, reviewee, vin, loggedInUsername, Integer.parseInt(score));
+        } catch (Exception e) {
+            System.err.println("Invalid input for a review score!");
+            reviewMenu();
+            return;
+        }
+        reviewMenu();
+    }
+    private static boolean isCancelReview(String input) throws Exception {
+        if(input.toLowerCase().trim().equals("!c")) {
+            System.out.println("Cancelled...");
+            reviewMenu();
+            return true;
+        }
+        return false;
+    }
     private static LocalDateTime chooseDate() throws Exception{
         String year, month, dayOfMonth, hour, minute;
         LocalDateTime date = null;

@@ -63,6 +63,11 @@ public class DbScoredFeedbackService {
         from ScoredFB group by car having car
         IN (select vin from UberCar where driver='driverUsername0')
         order by avg_score desc limit
+
+        select *
+        from select car, reviewee from ScoredFB group by car, reviewee
+        having car IN (select vin from UberCar where driver='driver')
+        order by
          */
         try {
             driverQuery = "SELECT vin from UberCar WHERE driver='" + driver + "' ";
