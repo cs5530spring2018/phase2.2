@@ -22,8 +22,11 @@ public class DbScoredFeedbackService {
         String results = "";
         try {
             while (rs.next()) {
-                results += "avg_rating: " + rs.getString(1) +
-                        "    car: " + rs.getString(2) + "\n";
+                results += "reviewee: " + rs.getString(1) +
+                        "    car: " + rs.getString(2) +
+                        "    reviewer: " + rs.getString(3) +
+                        "    usefulness_score: " + rs.getString(4) +
+                        "\n";
             }
             return results;
         }
@@ -55,9 +58,6 @@ public class DbScoredFeedbackService {
 
     public ResultSet usefulFeedbackByDriver(Statement stmt, String driver, int numResults) throws Exception {
         String query;
-        String driverQuery;
-        String driverSet;
-        ResultSet rs;
         /*
         select fb.reviewer, fb.car, fb.rating, fb.comment, fb.date
         from (select * from (select car, reviewee, avg(usefulness_score) as avg
@@ -69,15 +69,15 @@ public class DbScoredFeedbackService {
                   where q2.car=fb.car and fb.reviewer=q2.reviewee;
          */
         try {
-            driverQuery = "SELECT vin from UberCar WHERE driver='" + driver + "' ";
-            rs = stmt.executeQuery(driverQuery);
-            driverSet = attrSetToString(rs, "vin");
-            rs.close();
-            query = "SELECT fb.reviewer, fb.car, fb.rating, fb.comment, fb.date FROM + " +
-                    "(SELECT * FROM (SELECT car, reviewee, avg(usefulness_score) AS avg " +
-                    "FROM ScoredFB GROUP BY car, reviewee HAVING CAR IN " + driverSet + ") AS q1 " +
-                    "ORDER BY q1.avg LIMIT " + Integer.toString(numResults) + ") AS q2, " +
-                    "CarFeedback fb WHERE q2.car=fb.car AND fb.reviewer=q2.reviewee";
+
+            query = "        select fb.reviewer, fb.car, fb.rating, fb.comment, fb.date\n" +
+                    "        from (select * from (select car, reviewee, avg(usefulness_score) as avg\n" +
+                    "                from ScoredFB\n" +
+                    "                group by car, reviewee\n" +
+                    "                having car in\n" +
+                    "                  (select vin from UberCar where driver='" + driver + "')) as q1\n" +
+                    "                  order by q1.avg limit 5) as q2, CarFeedback fb\n" +
+                    "                  where q2.car=fb.car and fb.reviewer=q2.reviewee";
 
             return stmt.executeQuery(query);
         }
