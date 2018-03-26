@@ -34,7 +34,6 @@ public class DbCarService {
         String query;
         try {
             query = "DELETE FROM UberCar WHERE vin='" + vin + "'";
-            System.out.println("Removing car with vin: " + vin);
             int success = stmt.executeUpdate(query);
             if(success > 0) {
                 System.out.println("Successfully removed car with vin: " + vin);
@@ -47,11 +46,10 @@ public class DbCarService {
         }
     }
 
-    public ResultSet fetchUberCars(Statement stmt, String driver) throws Exception{
+    public ResultSet fetchUberCarsForDriver(Statement stmt, String driver) throws Exception{
         String query;
         try {
             query = "SELECT * FROM UberCar WHERE driver='" + driver + "'";
-            System.out.println("Fetching all cars for driver: " + driver);
             return stmt.executeQuery(query);
         } catch (Exception e) {
             e.printStackTrace();
@@ -60,6 +58,17 @@ public class DbCarService {
         }
     }
 
+    public ResultSet fetchUberCarDetails(Statement stmt, String vin) throws Exception{
+        String query;
+        try {
+            query = "SELECT * FROM UberCar WHERE vin='" + vin + "'";
+            return stmt.executeQuery(query);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Could not fetch car with vin: " + vin);
+            throw (e);
+        }
+    }
     /*
         ResultSet must have all car columns, please give it result of availableCars()
      */
