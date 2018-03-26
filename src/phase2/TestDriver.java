@@ -616,13 +616,13 @@ public class TestDriver {
                     break;
                 case "4":
                     System.out.println("          Most useful reviews:");
-                    System.out.println("Enter driver's name whose most useful reviews you'd like to see:");
+                    System.out.println("Enter driver's name whose most useful reviews you'd like to see (or type '!c' to cancel):");
                     while ((driver = in.readLine()) == null && driver.length() == 0) ;
                     if (isCancelReview(driver)) {
                         return;
                     }
 
-                    System.out.println("Enter in the number of useful reviews you'd like to see:");
+                    System.out.println("Enter in the number of useful reviews you'd like to see (or type '!c' to cancel):");
                     while ((numResults = in.readLine()) == null && numResults.length() == 0) ;
                     if (isCancelReview(numResults)) {
                         return;

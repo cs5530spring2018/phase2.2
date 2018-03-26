@@ -76,7 +76,7 @@ public class DbScoredFeedbackService {
                     "                group by car, reviewee\n" +
                     "                having car in\n" +
                     "                  (select vin from UberCar where driver='" + driver + "')) as q1\n" +
-                    "                  order by q1.avg limit 5) as q2, CarFeedback fb\n" +
+                    "                  order by q1.avg limit "+ numResults +"  ) as q2, CarFeedback fb\n" +
                     "                  where q2.car=fb.car and fb.reviewer=q2.reviewee";
 
             return stmt.executeQuery(query);
