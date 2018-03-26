@@ -3,6 +3,7 @@ package phase2;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.Scanner;
@@ -236,7 +237,7 @@ public class TestDriver {
         //driverLandingMenu structure
         System.out.println("         You are logged in as a Driver         ");
         System.out.println("1. your UberCar menu");
-        System.out.println("2. your hours of operation menu");
+        System.out.println("2. your HoursOfOp menu");
         System.out.println("3. log out");
         System.out.println("please enter your choice:");
 
@@ -247,7 +248,7 @@ public class TestDriver {
                 driverUberCarMenu();
                 break;
             case "2":
-                //TODO: add/update hours of operation
+                driverHoursOfOpMenu();
                 break;
             case "3":
                 logOut();
@@ -257,6 +258,154 @@ public class TestDriver {
                 driverLandingMenu();
                 break;
         }
+    }
+
+    private static void driverHoursOfOpMenu() throws Exception {
+        DbHoursOfOpService service = new DbHoursOfOpService();
+        String choice;
+        String startHour;
+        String startMinutes;
+        String finishHour;
+        String finishMinutes;
+        String day = "invalid";
+
+        System.out.println("          Hours Of Operation Menu:          ");
+        System.out.println("1. view your hours of operation");
+        System.out.println("2. add hours of operation");
+        System.out.println("3. remove hours of operation");
+        System.out.println("4. leave Hours Of Operation Menu");
+        System.out.println("please enter your choice:");
+
+        while ((choice = in.readLine()) == null && choice.length() == 0);
+
+        switch (choice) {
+            case "1":
+                System.out.println("          Hours of Operation for: " + loggedInUsername + "          ");
+                System.out.println(service.printableHoursOfOp(service.fetchHoursOfOp(con.stmt, loggedInUsername)));
+                driverHoursOfOpMenu();
+                break;
+            case "2":
+                System.out.println("         New Hours Of Operation          ");
+                System.out.println("Enter in the following Hours Of Operation Info");
+                while(day.equals("invalid")) {day = selectDay(); }
+                if(isCancelHoursOfOp(day)) { return; }
+
+                System.out.println("Enter the starting hour (0-23) (or type '!c' to cancel):");
+                while ((startHour = in.readLine()) == null && startHour.length() == 0);
+                if(isCancelHoursOfOp(startHour)) { return; }
+
+                System.out.println("Enter the starting minutes (0-59) (or type '!c' to cancel):");
+                while ((startMinutes = in.readLine()) == null && startMinutes.length() == 0);
+                if(isCancelHoursOfOp(startMinutes)) { return; }
+
+                System.out.println("Enter the finishing hour (0-23) (or type '!c' to cancel):");
+                while ((finishHour = in.readLine()) == null && finishHour.length() == 0);
+                if(isCancelHoursOfOp(finishHour)) { return; }
+
+                System.out.println("Enter the finishing minutes (0-59) (or type '!c' to cancel):");
+                while ((finishMinutes = in.readLine()) == null && finishMinutes.length() == 0);
+                if(isCancelHoursOfOp(finishMinutes)) { return; }
+
+                service.createHoursOfOp(con.stmt, loggedInUsername, convertTime(startHour, startMinutes), convertTime( finishHour, finishMinutes), Integer.parseInt(day));
+                driverHoursOfOpMenu();
+                break;
+            case "3":
+                System.out.println("         Remove Hours Of Operation          ");
+                System.out.println("Enter in the following Hours Of Operation Info");
+                while(day.equals("invalid")) {day = selectDay(); }
+                if(isCancelHoursOfOp(day)) { return; }
+
+                System.out.println("Enter the starting hour (0-23) (or type '!c' to cancel):");
+                while ((startHour = in.readLine()) == null && startHour.length() == 0);
+                if(isCancelHoursOfOp(startHour)) { return; }
+
+                System.out.println("Enter the starting minutes (0-59) (or type '!c' to cancel):");
+                while ((startMinutes = in.readLine()) == null && startMinutes.length() == 0);
+                if(isCancelHoursOfOp(startMinutes)) { return; }
+
+                System.out.println("Enter the finishing hour (0-23) (or type '!c' to cancel):");
+                while ((finishHour = in.readLine()) == null && finishHour.length() == 0);
+                if(isCancelHoursOfOp(finishHour)) { return; }
+
+                System.out.println("Enter the finishing minutes (0-59) (or type '!c' to cancel):");
+                while ((finishMinutes = in.readLine()) == null && finishMinutes.length() == 0);
+                if(isCancelHoursOfOp(finishMinutes)) { return; }
+
+                service.removeHoursOfOp(con.stmt, loggedInUsername, convertTime(startHour, startMinutes), convertTime( finishHour, finishMinutes), Integer.parseInt(day));
+                driverHoursOfOpMenu();
+                break;
+            case "4":
+                driverLandingMenu();
+                break;
+            default:
+                System.out.println("Invalid Selection...");
+                driverHoursOfOpMenu();
+        }
+    }
+
+    private static float convertTime(String hour, String minute) {
+        float floatHour, floatMinute;
+        try{
+            floatHour = Float.parseFloat(hour);
+            floatMinute = Float.parseFloat(minute);
+        } catch (Exception e) {
+            System.err.println("Error converting time to float");
+            return -1f;
+        }
+        return round(floatHour + (floatMinute/60f), 2);
+    }
+
+    private static float round(float d, int decimalPlace) {
+        BigDecimal bd = new BigDecimal(Float.toString(d));
+        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
+        return bd.floatValue();
+    }
+
+    private static String selectDay() throws Exception {
+        String choice;
+        System.out.println("Select a day of the week:");
+        System.out.println("1. sunday");
+        System.out.println("2. monday");
+        System.out.println("3. tuesday");
+        System.out.println("4. wednesday");
+        System.out.println("5. thursday");
+        System.out.println("6. friday");
+        System.out.println("7. saturday");
+        System.out.println("8. quit");
+        System.out.println("please enter your choice:");
+
+        while ((choice = in.readLine()) == null && choice.length() == 0);
+
+        switch (choice) {
+            case "1":
+                return "0";
+            case "2":
+                return "1";
+            case "3":
+                return "2";
+            case "4":
+                return "3";
+            case "5":
+                return "4";
+            case "6":
+                return "5";
+            case "7":
+                return "6";
+            case "8":
+                return "!c";
+            default:
+                System.out.println("Invalid Selection...");
+                return "invalid";
+        }
+    }
+
+    private static boolean isCancelHoursOfOp(String input) throws Exception{
+        if(input.toLowerCase().trim().equals("!c")) {
+            System.out.println("Browsing cancelled...");
+            driverHoursOfOpMenu();
+            return true;
+        }
+        return false;
     }
 
     private static void driverUberCarMenu() throws Exception {
@@ -274,7 +423,6 @@ public class TestDriver {
 
         switch (choice) {
             case "1":
-                //TODO: execute search query
                 System.out.println(service.printableCars(service.fetchUberCars(con.stmt, loggedInUsername)));
                 driverUberCarMenu();
                 break;
@@ -493,6 +641,7 @@ public class TestDriver {
         }
 
     }
+
     private static String browseCarCategory() throws Exception {
         String choice;
         System.out.println("Select a category:");
