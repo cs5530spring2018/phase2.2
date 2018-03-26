@@ -15,7 +15,6 @@ public class TestDriver {
     private static  BufferedReader in;
     /*Global app data*/
     private static String loggedInUsername;
-    private static boolean loggedInIsDriver;
 
     /**Start of the Application*/
     public static void main(String[] args) {
@@ -44,7 +43,6 @@ public class TestDriver {
         try {
             // main menu structure
             System.out.println("        Welcome to Team 61's Uber App!     ");
-            System.out.println("0. enter your own query"); //TODO: Eventually Remove this option
             System.out.println("1. driver login");
             System.out.println("2. user login");
             System.out.println("3. admin login");
@@ -55,22 +53,6 @@ public class TestDriver {
             while ((choice = in.readLine()) == null && choice.length() == 0) ;
 
             switch (choice) {
-                case "0": //TODO: Eventually remove this option
-                    System.out.println("please enter your query below:");
-                    while ((sql = in.readLine()) == null && sql.length() == 0)
-                        System.out.println(sql);
-                    ResultSet rs = con.stmt.executeQuery(sql);
-                    ResultSetMetaData rsmd = rs.getMetaData();
-                    int numCols = rsmd.getColumnCount();
-                    while (rs.next()) {
-                        for (int i = 1; i <= numCols; i++) {
-                            System.out.print(rs.getString(i) + "  ");
-                        }
-                        System.out.println("");
-                    }
-                    System.out.println(" ");
-                    rs.close();
-                    break;
                 case "1":
                     loginMenu("UberDriver");
                     break;
@@ -151,9 +133,8 @@ public class TestDriver {
         if (service.attemptToLogIn(con.stmt, login, password, table)) {
             System.out.println("Login Successful. Welcome " + login);
             loggedInUsername = login;
-            loggedInIsDriver = table.equals("UberDriver");
 
-            if(loggedInIsDriver){
+            if(table.equals("UberDriver")){
                 driverLandingMenu();
             } else {
                 userLandingMenu();
@@ -1317,7 +1298,6 @@ public class TestDriver {
     }
 
     private static void logOut() throws Exception{
-        loggedInIsDriver = false;
         loggedInUsername = "";
         System.out.println("You have successfully logged out. See ya!");
         mainMenu();
