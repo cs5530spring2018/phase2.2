@@ -112,7 +112,7 @@ public class InitializeDb {
             //boolean twoDegree = s.twoDegreesOfSeparation(con.stmt, "username0", "username98");
             //System.out.println("user1 and 0: " + twoDegree);
             DbScoredFeedbackService fb = new DbScoredFeedbackService();
-            System.out.println(fb.printUsefulFeedback(fb.usefulFeedbackByDriver(con.stmt, "driverUsername10", 10)));
+            System.out.println(fb.printUsefulFeedback(fb.usefulFeedbackByDriver(con.stmt, "driverUsername1", 10)));
 
         }
         catch (Exception e)
