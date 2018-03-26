@@ -3,6 +3,8 @@ package phase2;
 import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class DbRideService {
@@ -24,13 +26,12 @@ public class DbRideService {
 	FOREIGN KEY (car) REFERENCES UberCar(vin)
      */
 
-    public void createRide(Statement stmt, String rider, String car, int num_riders, double cost, double distance, Date date, String to_address, String from_address) {
+    public void createRide(Statement stmt, String rider, String car, int num_riders, double cost, double distance, LocalDateTime date, String to_address, String from_address) {
         String query;
 
         // Format the date so mysql will accept is as a datetime
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        String formattedDate = sdf.format(date);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String formattedDate = formatter.format(date);
 
         try {
             query = "INSERT INTO Ride (rider, car, num_riders, cost, distance, date, to_address, from_address)" +

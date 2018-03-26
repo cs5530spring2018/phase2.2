@@ -2,6 +2,8 @@ package phase2;
 
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class DbReservationService {
@@ -16,13 +18,11 @@ public class DbReservationService {
 	FOREIGN KEY (car) REFERENCES UberCar(vin)
      */
 
-    public void createReservation(Statement stmt, String user, String car, Date time) {
+    public void createReservation(Statement stmt, String user, String car, LocalDateTime time) {
         String query;
         // Format the date so mysql will accept is as a datetime
-        SimpleDateFormat sdf =
-                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        String formattedDate = sdf.format(time);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String formattedDate = formatter.format(time);
 
         try {
             query = "INSERT INTO Reserve (user, car, time)" +

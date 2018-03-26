@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 public class TestDriver {
@@ -204,6 +206,7 @@ public class TestDriver {
         }
         return false;
     }
+
     /**
      * Connects the application to our Database
      * */
@@ -423,7 +426,7 @@ public class TestDriver {
 
         switch (choice) {
             case "1":
-                System.out.println(service.printableCars(service.fetchUberCars(con.stmt, loggedInUsername)));
+                System.out.println(service.printableCars(service.fetchUberCarsForDriver(con.stmt, loggedInUsername)));
                 driverUberCarMenu();
                 break;
             case "2":
@@ -543,9 +546,11 @@ public class TestDriver {
         switch (choice){
             case "1":
                 //TODO: find a ride menu w/confirmation
+                findRide(false);
                 break;
             case "2":
                 //TODO: reserve a car menu w/ confirmation
+                findRide(true);
                 break;
             case "3":
                 //TODO: browse cars menu
@@ -582,6 +587,168 @@ public class TestDriver {
                 userLandingMenu();
                 break;
         }
+    }
+
+    private static LocalDateTime chooseDate() throws Exception{
+        String year, month, dayOfMonth, hour, minute;
+        LocalDateTime date = null;
+        System.out.println("Choose the date for your reservation: ");
+        System.out.println("What year (YYYY) is the reservation for? (type '!c' to cancel)");
+        while ((year = in.readLine()) == null && year.length() == 0);
+        if(isCancelRide(year)) { return null; }
+
+        System.out.println("What month (1-12) is the reservation for? (type '!c' to cancel)");
+        while ((month = in.readLine()) == null && month.length() == 0);
+        if(isCancelRide(month)) { return null; }
+
+        System.out.println("What day (1-31) is the reservation for? (type '!c' to cancel)");
+        while ((dayOfMonth = in.readLine()) == null && dayOfMonth.length() == 0);
+        if(isCancelRide(dayOfMonth)) { return null; }
+
+        System.out.println("What hour (0-23) is the reservation for? (type '!c' to cancel)");
+        while ((hour = in.readLine()) == null && hour.length() == 0);
+        if(isCancelRide(hour)) { return null; }
+
+        System.out.println("What minute (0-59) is the reservation for? (type '!c' to cancel)");
+        while ((minute = in.readLine()) == null && minute.length() == 0);
+        if(isCancelRide(minute)) { return null; }
+
+        try {
+            date = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(dayOfMonth), Integer.parseInt(hour), Integer.parseInt(minute));
+        } catch (Exception e) {
+            System.err.println("Your Date input was invalid!");
+            return null;
+        }
+        return date;
+    }
+
+    private static void findRide(boolean reserve) throws Exception{
+        DbCarService carService = new DbCarService();
+        DbRideService rideService = new DbRideService();
+        DbReservationService reservationService = new DbReservationService();
+        String vin;
+        String num_riders;
+        String distance;
+        String to;
+        String from;
+        String confirm;
+        LocalDateTime date = null;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        System.out.println("          Available Rides         ");
+        if(reserve) {
+            date = chooseDate();
+            if(date == null) {
+                return;
+            }
+            String availableCars = carService.printableCars(carService.availableCars(con.stmt, convertTime(Integer.toString(date.getHour()), Integer.toString(date.getMinute())),
+                    dayOfTheWeekAdjuster(date.getDayOfWeek().getValue())));
+            if(availableCars.trim().length() == 0) {
+                String formattedDate = formatter.format(date);
+                System.out.println("No available cars on: " + formattedDate);
+                userLandingMenu();
+                return;
+            } else {
+                System.out.println(availableCars);
+            }
+        } else {
+            String availableCars = carService.printableCars(carService.availableCars(con.stmt, getNowTimeAsFloat(),
+                    dayOfTheWeekAdjuster(LocalDateTime.now().getDayOfWeek().getValue())));
+            if(availableCars.trim().length() == 0) {
+                System.out.println("Sorry! No cars are available at the moment!");
+                userLandingMenu();
+                return;
+            } else {
+                System.out.println(availableCars);
+            }
+        }
+
+        System.out.println("Select An Available Ride From Above by Entering its vin (type '!c' to cancel):");
+        while ((vin = in.readLine()) == null && vin.length() == 0);
+        if(isCancelRide(vin)) { return; }
+
+        System.out.println("How many riders including you? (type '!c' to cancel):");
+        while ((num_riders = in.readLine()) == null && num_riders.length() == 0);
+        if(isCancelRide(num_riders)) { return; }
+
+        System.out.println("How far are you going (in miles)? (type '!c' to cancel):");
+        while ((distance = in.readLine()) == null && distance.length() == 0);
+        if(isCancelRide(distance)) { return; }
+
+        System.out.println("What's the address of where you are going? (type '!c' to cancel):");
+        while ((to = in.readLine()) == null && to.length() == 0);
+        if(isCancelRide(to)) { return; }
+
+        System.out.println("Where are you going to be picked up? (type '!c' to cancel):");
+        while ((from = in.readLine()) == null && from.length() == 0);
+        if(isCancelRide(from)) { return; }
+
+        if(reserve){
+            String formattedDate = formatter.format(date);
+            System.out.println("Confirm your Reservation with: ");
+            System.out.println(carService.printableCars(carService.fetchUberCarDetails(con.stmt, vin)));
+            System.out.println("On: " + formattedDate);
+        } else {
+            System.out.println("Confirm your Ride with: ");
+            System.out.println(carService.printableCars(carService.fetchUberCarDetails(con.stmt, vin)));
+            System.out.println("You are going from " + from + " to " + to + ". Distance of " + distance + " miles.");
+            System.out.println("The total number of people in this ride is: " + num_riders);
+            System.out.println("The total cost will be $" + distance);
+        }
+        System.out.println("1. Yes");
+        System.out.println("2. No");
+        System.out.println("please enter your choice:");
+        while((confirm = in.readLine()) == null && confirm.length() == 0);
+        switch (confirm){
+            case "1":
+                if(reserve){
+                    try {
+                        System.out.println("Adding Reservation...");
+                        reservationService.createReservation(con.stmt, loggedInUsername, vin, date);
+                    } catch (Exception e) {
+                        System.err.println("Some of your input was invalid!");
+                        userLandingMenu();
+                        return;
+                    }
+                } else {
+                    System.out.println("Adding Ride...");
+                    try {
+                        rideService.createRide(con.stmt, loggedInUsername, vin, Integer.parseInt(num_riders),
+                                Double.parseDouble(distance), Double.parseDouble(distance), LocalDateTime.now(), to, from);
+                    } catch (Exception e) {
+                        System.err.println("Some of your input was invalid!");
+                        userLandingMenu();
+                        return;
+                    }
+                }
+                break;
+            case "2":
+                System.out.println("Cancelling...");
+                userLandingMenu();
+                return;
+        }
+        userLandingMenu();
+    }
+
+    private static boolean isCancelRide(String input) throws Exception{
+        if(input.toLowerCase().trim().equals("!c")) {
+            System.out.println("Ride cancelled...");
+            userLandingMenu();
+            return true;
+        }
+        return false;
+    }
+
+    /**Our DB entries have dates 0 (Sun) - 6 (Sat)
+     * LocalDateTime has dates 1 (Mon) - 7 (Sun)
+     * This adjusts the date so Sun uses 0 instead of 7*/
+    private static int dayOfTheWeekAdjuster(int dayOfTheWeek){
+        if(dayOfTheWeek == 7) { return 0; }
+        return dayOfTheWeek;
+    }
+
+    private static Float getNowTimeAsFloat() {
+        LocalDateTime now = LocalDateTime.now();
+        return convertTime(Integer.toString(now.getHour()), Integer.toString(now.getMinute()));
     }
 
     private static void browseCars() throws Exception{
