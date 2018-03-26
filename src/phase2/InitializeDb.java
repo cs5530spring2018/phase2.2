@@ -215,7 +215,7 @@ public class InitializeDb {
         }
     }
 
-    private static void makeCarFeedback(Statement stmt, int numFeedback) {
+  /*  private static void makeCarFeedback(Statement stmt, int numFeedback) {
         DbCarFeedbackService service = new DbCarFeedbackService();
         String reviewer = "username";
         String temp_reviewer;
@@ -236,7 +236,7 @@ public class InitializeDb {
 
             service.createCarFeedback(stmt, temp_reviewer, temp_car, rating, comment, date);
         }
-    }
+    } */
 
     private static void makeFeebackScores(Statement stmt, int numScores) {
         DbScoredFeedbackService service = new DbScoredFeedbackService();

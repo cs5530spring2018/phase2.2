@@ -67,7 +67,6 @@ public class DbScoredFeedbackService {
                   (select vin from UberCar where driver='driverUsername1')) as q1
                   order by q1.avg limit 5) as q2, CarFeedback fb
                   where q2.car=fb.car and fb.reviewer=q2.reviewee;
-
          */
         try {
             driverQuery = "SELECT vin from UberCar WHERE driver='" + driver + "' ";
