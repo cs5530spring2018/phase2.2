@@ -170,36 +170,6 @@ public class DbCarService {
         }
     }
 
-    private ResultSet modelQuery(Statement stmt, String model) throws Exception {
-        String query = "SELECT vin FROM UberCar";
-        try {
-            if (model.length() != 0) {
-                query += " WHERE model LIKE %" + model + "%";
-            }
-            return  stmt.executeQuery(query);
-        }
-        catch(Exception e) {
-            System.err.println("Unable to execute query:"+query+"\n");
-            System.err.println(e.getMessage());
-            throw(e);
-        }
-    }
-
-    private ResultSet addressQuery(Statement stmt, String address) throws Exception {
-        String addressQuery = "SELECT uc.vin AS vin FROM UberCar uc, UberDriver ud WHERE uc.driver=ud.login AND ud.address LIKE '%" + address + "%'";
-        try {
-            if (address.length() == 0) {
-                return stmt.executeQuery("SELECT vin FROM UberCar");
-            }
-            return stmt.executeQuery(addressQuery);
-        }
-        catch(Exception e) {
-            System.err.println("Unable to execute query:"+addressQuery+"\n");
-            System.err.println(e.getMessage());
-            throw(e);
-        }
-    }
-
     private String modelAggregateQuery(Statement stmt, String catResults, String model, String andor) throws Exception {
         ResultSet modelResults;
         String modelQuery = "SELECT vin FROM UberCar WHERE";
