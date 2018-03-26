@@ -308,7 +308,7 @@ public class InitializeDb {
         }
     }
 
-    private static void makeReservations(Statement stmt, int numRecords) {
+  /*  private static void makeReservations(Statement stmt, int numRecords) {
         DbReservationService service = new DbReservationService();
         String user = "username";
         String temp_user;
@@ -345,6 +345,6 @@ public class InitializeDb {
             num_riders = i % 2 + 1;
             service.createRide(stmt, temp_rider, temp_car, num_riders, cost, distance, date, to_address, from_address);
         }
-    }
+    } */
 }
 
