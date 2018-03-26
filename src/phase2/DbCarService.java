@@ -291,6 +291,7 @@ public class DbCarService {
                 tfQuery = "SELECT car FROM CarFeedback WHERE reviewer IN " + revieweeSet + " AND car IN " + allVins;
                 trustedFeedbackResults = stmt.executeQuery(tfQuery);
                 feedbackSet = attrSetToString(trustedFeedbackResults, "car");
+                // Note that the join operation on the cache sets reverses, so don't do DESC order
                 sortQuery = "SELECT car, AVG(rating) AS average FROM CarFeedback WHERE car IN " + feedbackSet + " GROUP BY car ORDER BY average ASC";
                 sortedResults = stmt.executeQuery(sortQuery);
             }
@@ -323,42 +324,6 @@ public class DbCarService {
         }
     }
 
-    public String sortedDataToString(ResultSet rs) throws Exception {
-        String output = "";
-        try {
-            while (rs.next()) {
-                output += rs.getString("car") + "   " + rs.getString("average") + "\n";
-            }
-        }
-        catch(Exception e) {
-            System.err.println("Unable to print data");
-            System.err.println(e.getMessage());
-            throw(e);
-        }
-        return output;
-    }
-
-    /*private ResultSet ucBrowserV2(Statement stmt, String category, String model, String address, String sort, int andOrMode) throws Exception{
-        String query;
-        ResultSet categoryResults = categoryQuery(stmt, category);
-        ResultSet modelResults = modelQuery(stmt, model);
-        ResultSet addrResults = addressQuery(stmt, address);
-        // 1. cat and model and add 2. cat and model or add 3. cat or model or add 4. cat and add or model
-        switch (andOrMode){
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                break;
-            default:
-                break;
-        }
-        //sort
-        //return
-    } */
     public ResultSet ucBrowser(Statement stmt, String category, String andor1, String model, String andor2, String address, String sort) throws Exception {
         String categoryResults = categoryQuery(stmt, category);
         String modelResults = modelAggregateQuery(stmt, categoryResults, model, andor1);
@@ -370,12 +335,11 @@ public class DbCarService {
 
     public ResultSet vinsToCars(Statement stmt, ResultSet vins) throws Exception {
         ResultSet cars;
-        String query = "Select * FROM UberCar WHERE vin IN (";
+        String vinSet = "";
+        String query = "Select * FROM UberCar WHERE vin IN ";
         try {
-            while (vins.next()) {
-                query += vins.getString("vin") + ", ";
-            }
-            query += ")";
+            vinSet = attrSetToString(vins, "car");
+            query += vinSet;
             cars = stmt.executeQuery(query);
             return cars;
         }
@@ -398,6 +362,70 @@ public class DbCarService {
         if (results.equals("()"))
             results = "('')";
         return results;
+    }
+
+    public ResultSet recommendedCars(Statement stmt, String driver) throws Exception {
+        String query = "";
+        ResultSet vins;
+        ResultSet allData;
+        JoinRowSet joinedRows = new JoinRowSetImpl();
+        CachedRowSet allCars = new CachedRowSetImpl();
+        CachedRowSet filteredCars = new CachedRowSetImpl();
+        /*
+        select count(r2.car) as c, r2.car
+        from Ride r2,
+            (select r.rider from Ride r where r.car='abcd0')
+            as q1
+         where r2.rider=q1.rider
+         group by r2.car
+         order by c desc;
+         */
+
+        try {
+            // Normally would be DESC but cache set join operation reverses it
+            query = "        select count(r2.car) as c, r2.car \n" +
+                    "        from Ride r2, \n" +
+                    "            (select r.rider from Ride r where r.car='" + driver + "') \n" +
+                    "            as q1 \n" +
+                    "         where r2.rider=q1.rider \n" +
+                    "         group by r2.car \n" +
+                    "         order by c";
+            vins = stmt.executeQuery(query);
+            filteredCars.populate(vins);
+            filteredCars.setMatchColumn(2);
+            allData = vinsToCars(stmt, filteredCars);
+            allCars.populate(allData);
+            allCars.setMatchColumn(1);
+            joinedRows.addRowSet(filteredCars);
+            joinedRows.addRowSet(allCars);
+            return joinedRows;
+        }
+        catch(Exception e) {
+            System.err.println("Unable to execute query:"+query+"\n");
+            System.err.println(e.getMessage());
+            throw(e);
+        }
+    }
+
+    public String printableRecommendedCars(ResultSet rs) {
+        String output = "";
+        try {
+            while (rs.next()) {
+                output += "ride_count: " + rs.getString(1) + "    " +
+                        "vin: " + rs.getString(2) + "    " +
+                        "driver: " + rs.getString(3) + "    " +
+                        "category: " + rs.getString(4) + "    " +
+                        "make: " + rs.getString(5) + "    " +
+                        "model: " + rs.getString(6) + "    " +
+                        "year: " + rs.getString(7) + "\n";
+            }
+            return output;
+        }
+        catch(Exception e) {
+            System.err.println("Unable to print\n");
+            System.err.println(e.getMessage());
+            return output;
+        }
     }
 
 }
