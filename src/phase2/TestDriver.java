@@ -582,8 +582,11 @@ public class TestDriver {
 
     private static void reviewMenu() throws Exception {
         DbCarFeedbackService carFeedbackService = new DbCarFeedbackService();
+        DbScoredFeedbackService scoredFeedbackService = new DbScoredFeedbackService();
         String choice;
         String vin;
+        String numResults;
+        String driver;
         System.out.println("          Review Menu:          ");
         System.out.println("1. view a car's reviews");
         System.out.println("2. leave a review for a car");
@@ -594,28 +597,51 @@ public class TestDriver {
 
         while ((choice = in.readLine()) == null && choice.length() == 0);
 
-        switch (choice) {
-            case "1":
-                System.out.println("Enter Vin # of the car whose reviews you want to see (or type '!c' to cancel):");
-                while ((vin = in.readLine()) == null && vin.length() == 0);
-                if(isCancelReview(vin)) { return; }
-                System.out.println(carFeedbackService.printFeedBack(carFeedbackService.fetchFeedbackForCar(con.stmt, vin)));
-                reviewMenu();
-                break;
-            case "2":
-                reviewCar();
-                break;
-            case "3":
-                scoreCarReview();
-                break;
-            case "4":
-                break;
-            case "5":
-                userLandingMenu();
-                break;
-            default:
-                System.out.println("Invalid Selection...");
-                reviewMenu();
+        try {
+            switch (choice) {
+                case "1":
+                    System.out.println("Enter Vin # of the car whose reviews you want to see (or type '!c' to cancel):");
+                    while ((vin = in.readLine()) == null && vin.length() == 0) ;
+                    if (isCancelReview(vin)) {
+                        return;
+                    }
+                    System.out.println(carFeedbackService.printFeedBack(carFeedbackService.fetchFeedbackForCar(con.stmt, vin)));
+                    reviewMenu();
+                    break;
+                case "2":
+                    reviewCar();
+                    break;
+                case "3":
+                    scoreCarReview();
+                    break;
+                case "4":
+                    System.out.println("          Most useful reviews:");
+                    System.out.println("Enter driver's name whose most useful reviews you'd like to see (or type '!c' to cancel):");
+                    while ((driver = in.readLine()) == null && driver.length() == 0) ;
+                    if (isCancelReview(driver)) {
+                        return;
+                    }
+
+                    System.out.println("Enter in the number of useful reviews you'd like to see (or type '!c' to cancel):");
+                    while ((numResults = in.readLine()) == null && numResults.length() == 0) ;
+                    if (isCancelReview(numResults)) {
+                        return;
+                    }
+
+                    System.out.println(scoredFeedbackService.printUsefulFeedback(scoredFeedbackService.usefulFeedbackByDriver(con.stmt, driver, Integer.parseInt(numResults))));
+                    reviewMenu();
+                    return;
+                case "5":
+                    userLandingMenu();
+                    break;
+                default:
+                    System.out.println("Invalid Selection...");
+                    reviewMenu();
+            }
+        }catch (Exception e) {
+            System.err.println("Something went wrong!");
+            reviewMenu();
+            return;
         }
     }
 
