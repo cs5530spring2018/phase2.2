@@ -26,7 +26,7 @@ public class DbHoursOfOpService {
         }
 
         try {
-            query = "INSERT INTO HoursOfOp (driver, start, finish, day)" +
+            query = "INSERT IGNORE INTO HoursOfOp (driver, start, finish, day)" +
                     " VALUES ('" + driver + "', '" + start + "', '" + finish + "', '" + day + "')";
 
             stmt.execute(query);

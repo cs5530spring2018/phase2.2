@@ -1,5 +1,6 @@
 package phase2;
 
+import java.sql.ResultSet;
 import java.sql.Statement;
 
 public class DbFavoritesService {
@@ -14,6 +15,25 @@ public class DbFavoritesService {
 	FOREIGN KEY (car) REFERENCES UberCar(vin)
      */
 
+    public boolean favoriteExists(Statement stmt, String user, String car) {
+        String query;
+        ResultSet rs;
+        boolean exists;
+
+        try {
+            query = "SELECT * FROM Favorites WHERE user='" + user + "' AND car='" + car + "'";
+            rs = stmt.executeQuery(query);
+            exists = rs.isBeforeFirst();
+            rs.close();
+            return exists;
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            System.err.println ("Could not query for favorite: " + e.getMessage());
+            return true;
+        }
+    }
+
     public void createFavorite(Statement stmt, String user, String car) {
         String query;
 
@@ -25,7 +45,7 @@ public class DbFavoritesService {
         }
         catch (Exception e) {
             e.printStackTrace();
-            System.err.println ("Could not create new Trust: " + e.getMessage());
+            System.err.println ("Could not create new Favorite: " + e.getMessage());
         }
     }
 }

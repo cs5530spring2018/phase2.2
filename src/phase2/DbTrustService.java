@@ -24,7 +24,8 @@ public class DbTrustService {
 
         try {
             query = "INSERT INTO Trusts (reviewer, reviewee, trust_score)" +
-                    " VALUES ('" + reviewer + "', '" + reviewee + "', '" + Integer.toString(score) + "')";
+                    " VALUES ('" + reviewer + "', '" + reviewee + "', '" + Integer.toString(score) + "')" +
+                    " ON DUPLICATE KEY UPDATE trust_score='" + Integer.toString(score) + "'";
 
             stmt.execute(query);
         }
