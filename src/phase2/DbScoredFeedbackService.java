@@ -59,20 +59,25 @@ public class DbScoredFeedbackService {
         String driverSet;
         ResultSet rs;
         /*
-        select car, avg(usefulness_score) as avg_score
-        from ScoredFB group by car having car
-        IN (select vin from UberCar where driver='driverUsername0')
-        order by avg_score desc limit
+        select avg(sfb.usefulness_score), fb.car
+        from ScoredFB sfb, CarFeedback fb
+        where sfb.reviewee=fb.reviewer
+        group by fb.car
+        having fb.car IN
+        (select uc.vin
+          from UberCar uc, UberDriver ud
+            where uc.driver=ud.login and ud.login='driverUsername3');
+
          */
         try {
-            driverQuery = "SELECT vin from UberCar WHERE driver='" + driver + "' ";
+            driverQuery = "SELECT uc.vin FROM UberCar uc, UberDriver ud " +
+                          "WHERE uc.driver=ud.login AND ud.login='" + driver + "'";
             rs = stmt.executeQuery(driverQuery);
             driverSet = attrSetToString(rs, "vin");
             rs.close();
-
-            query = "SELECT AVG(usefulness_score), car AS avg_score FROM " +
-                    "ScoredFB GROUP BY car HAVING car IN " + driverSet +
-                    "ORDER BY avg_score DESC LIMIT " + Integer.toString(numResults);
+            query = "SELECT AVG(sfb.usefulness_score), fb.car FROM " +
+                    "ScoredFB sfb, Carfeedback fb WHERE sfb.reviewee=fb.reviewer " +
+                    "GROUP BY fb.car HAVING fb.car IN " + driverSet;
 
             return stmt.executeQuery(query);
         }
