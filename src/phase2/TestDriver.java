@@ -47,8 +47,9 @@ public class TestDriver {
             System.out.println("0. enter your own query"); //TODO: Eventually Remove this option
             System.out.println("1. driver login");
             System.out.println("2. user login");
-            System.out.println("3. register account");
-            System.out.println("4. exit");
+            System.out.println("3. admin login");
+            System.out.println("4. register account");
+            System.out.println("5. exit");
             System.out.println("please enter your choice:");
 
             while ((choice = in.readLine()) == null && choice.length() == 0) ;
@@ -72,14 +73,17 @@ public class TestDriver {
                     break;
                 case "1":
                     loginMenu("UberDriver");
-                    return;
+                    break;
                 case "2":
                     loginMenu("UberUser");
                     break;
                 case "3":
-                    registerMenu();
+                    adminLoginMenu();
                     break;
                 case "4":
+                    registerMenu();
+                    break;
+                case "5":
                     System.out.println("Exiting Application...");
                     con.stmt.close();
                     break;
@@ -94,6 +98,39 @@ public class TestDriver {
         }
     }
 
+    private static void adminLoginMenu() throws Exception{
+        DbStatisticsService service = new DbStatisticsService();
+        String choice;
+        String numResults;
+        System.out.println("          Admin Login");
+        System.out.println("1. view most useful users");
+        System.out.println("2. logout");
+
+        while ((choice = in.readLine()) == null && choice.length() == 0);
+
+        try {
+            switch (choice) {
+                case "1":
+                    System.out.println("Enter the number of most useful users you'd like to see (or type '!c' to cancel)");
+                    while ((numResults = in.readLine()) == null && numResults.length() == 0) ;
+                    if (numResults.equals("!c")) {
+                        System.out.println("Cancelling...");
+                        adminLoginMenu();
+                        return;
+                    }
+                    System.out.println("          Most Useful Users");
+                    System.out.println(service.printableStatistics(service.mostUsefulUsers(con.stmt, Integer.parseInt(numResults)), "avg_score"));
+                    adminLoginMenu();
+                    break;
+                case "2":
+                    logOut();
+            }
+        } catch (Exception e) {
+            System.err.println("Something went wrong!");
+            adminLoginMenu();
+            return;
+        }
+    }
     /**
      * Menu responsible for guiding the user's logging in
      * */
@@ -913,6 +950,8 @@ public class TestDriver {
                     try {
                         System.out.println("Adding Reservation...");
                         reservationService.createReservation(con.stmt, loggedInUsername, vin, date);
+                        System.out.println("          Here are some suggested cars!");
+                        System.out.println(carService.printableRecommendedCars(carService.recommendedCars(con.stmt, vin)));
                     } catch (Exception e) {
                         System.err.println("Some of your input was invalid!");
                         userLandingMenu();
