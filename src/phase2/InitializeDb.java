@@ -113,8 +113,8 @@ public class InitializeDb {
             //System.out.println("user1 and 0: " + twoDegree);
             //DbScoredFeedbackService fb = new DbScoredFeedbackService();
             //System.out.println(fb.printUsefulFeedback(fb.usefulFeedbackByDriver(con.stmt, "driverUsername1", 10)));
-            //DbCarService s = new DbCarService();
-            //System.out.println(s.printableRecommendedCars(s.recommendedCars(con.stmt, "abcd0")));
+            DbCarService s = new DbCarService();
+            System.out.println(s.printableRecommendedCars(s.recommendedCars(con.stmt, "abcd0")));
         }
         catch (Exception e)
         {
