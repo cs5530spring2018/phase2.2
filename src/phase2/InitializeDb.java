@@ -67,12 +67,40 @@ public class InitializeDb {
             //makeRides(con.stmt, 100);
 
             //System.out.println("Testing upsert");
-            DbCarService carService = new DbCarService();
+            //DbCarService carService = new DbCarService();
             //carService.createUberCar(con.stmt, "abcd0", "driverUsername0", "Truck", "Ford", "F-150", 2018);
             //ResultSet rset = carService.availableCars(con.stmt, 12.15f, 3);
             //System.out.println(carService.printableAvailableCars(rset));
-            ResultSet rset = carService.ucBrowser(con.stmt, "", "", "Toyota", "AND", "UT", "b");
-            System.out.println(carService.printableCars(rset));
+            //ResultSet rset = carService.ucBrowser(con.stmt, "", "", "Toyota", "AND", "UT", "b");
+            //System.out.println(carService.printableCars(rset));
+            DbStatisticsService s = new DbStatisticsService();
+            ResultSet rs = s.mostPopularUcByRide(con.stmt, 5, "luxury");
+            System.out.println(s.printablePopularRides(rs, "total_rides"));
+            rs = s.mostPopularUcByRide(con.stmt, 5, "comfort");
+            System.out.println(s.printablePopularRides(rs, "total_rides"));
+            rs = s.mostPopularUcByRide(con.stmt, 5, "economy");
+            System.out.println(s.printablePopularRides(rs, "total_rides"));
+            rs.close();
+            rs = s.mostExpensiveUcByCategory(con.stmt, 5, "luxury");
+            System.out.println(s.printablePopularRides(rs, "avg_price"));
+            rs.close();
+            rs = s.highestRatedUdByCategory(con.stmt, 5, "luxury");
+            System.out.println(s.printablePopularRides(rs, "avg_rating"));
+            rs.close();
+            rs = s.highestRatedUdByCategory(con.stmt, 5, "economy");
+            System.out.println(s.printablePopularRides(rs, "avg_rating"));
+            rs.close();
+            rs = s.highestRatedUdByCategory(con.stmt, 5, "comfort");
+            System.out.println(s.printablePopularRides(rs, "avg_rating"));
+            rs.close();
+            rs = s.mostExpensiveUcByCategory(con.stmt, 5, "comfort");
+            System.out.println(s.printablePopularRides(rs, "avg_cost"));
+            rs.close();
+            rs = s.mostExpensiveUcByCategory(con.stmt, 5, "luxury");
+            System.out.println(s.printablePopularRides(rs, "avg_cost"));
+            rs.close();
+            rs = s.mostExpensiveUcByCategory(con.stmt, 5, "economy");
+            System.out.println(s.printablePopularRides(rs, "avg_cost"));
         }
         catch (Exception e)
         {
