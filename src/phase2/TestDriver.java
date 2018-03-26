@@ -533,12 +533,10 @@ public class TestDriver {
         System.out.println("3. browse cars");
         System.out.println("4. declare a car as your favorite");
         System.out.println("5. open reviews menu");
-        System.out.println("6. score someone else's review");
-        System.out.println("7. view most useful reviews");
-        System.out.println("8. declare other users as (un)trustworthy");
-        System.out.println("9. check degrees of separation");
-        System.out.println("10. view statistics menu");
-        System.out.println("11. log out");
+        System.out.println("6. declare other users as (un)trustworthy");
+        System.out.println("7. check degrees of separation");
+        System.out.println("8. view statistics menu");
+        System.out.println("9. log out");
         System.out.println("please enter your choice:");
 
         while ((choice = in.readLine()) == null && choice.length() == 0) ;
@@ -558,31 +556,21 @@ public class TestDriver {
                 break;
             case "4":
                 favoritesMenu();
-                userLandingMenu();
                 break;
             case "5":
-                //TODO: review a car menu
+                //review a car menu
                 reviewMenu();
                 break;
             case "6":
-                //TODO: score someone's review menu
+                trustMenu();
                 break;
             case "7":
-                //TODO: return most useful reviews
-                userLandingMenu();
+                degreeMenu();
                 break;
             case "8":
-                trustMenu();
-                userLandingMenu();
-                break;
-            case "9":
-                degreeMenu();
-                userLandingMenu();
-                break;
-            case "10":
                 //TODO: statistics menu
                 break;
-            case "11":
+            case "9":
                 logOut();
                 break;
             default:
@@ -1056,14 +1044,20 @@ public class TestDriver {
         System.out.println("Please enter a vin #: ");
         while ((vin = in.readLine()) == null && vin.length() == 0);
         try {
-            if (vin.equals("back"))
+            if (vin.equals("back")) {
                 userLandingMenu();
+                return;
+            }
             if (!cService.uberCarExists(con.stmt, vin)) {
                 System.out.println("Sorry, car does not exists");
                 favoritesMenu();
+                return;
             }
-            if (!fService.favoriteExists(con.stmt, loggedInUsername, vin))
+            if (!fService.favoriteExists(con.stmt, loggedInUsername, vin)) {
                 fService.createFavorite(con.stmt, loggedInUsername, vin);
+                favoritesMenu();
+                return;
+            }
         }
         catch(Exception e) {
             System.out.println("That car may not exist, please try again");
@@ -1081,15 +1075,19 @@ public class TestDriver {
         System.out.println("Please enter a username: ");
         while ((username = in.readLine()) == null && username.length() == 0);
         try {
-            if (username.equals("back"))
+            if (username.equals("back")) {
                 userLandingMenu();
+                return;
+            }
             if (uService.isLoginAvailable(con.stmt, username, "UberUser")) {
                 System.out.println("Sorry, user does not exists");
                 trustMenu();
+                return;
             }
             if (username.equals(loggedInUsername)) {
                 System.out.println("Can't give yourself a rating!");
                 trustMenu();
+                return;
             }
             System.out.println("1. Trust User");
             System.out.println("2. Distrust User");
@@ -1099,33 +1097,36 @@ public class TestDriver {
             switch (choice) {
                 case "1":
                     tService.createTrust(con.stmt, loggedInUsername, username, 1);
+                    System.out.println("Marked user: " + username + " as trustworthy.");
                     break;
                 case "2":
                     tService.createTrust(con.stmt, loggedInUsername, username, 0);
+                    System.out.println("Marked user: " + username + " as untrustworthy");
                     break;
                 default:
                     System.out.println("Invalid choice");
                     trustMenu();
-                    break;
+                    return;
             }
         }
         catch(Exception e) {
             System.out.println("That car may not exist, please try again");
             favoritesMenu();
         }
+        trustMenu();
     }
 
     private static void degreeMenu() {
-        String username1 = "";
-        String username2 = "";
+        String username1;
+        String username2;
         String choice;
         DbUserService uService = new DbUserService();
         DbStatisticsService sService = new DbStatisticsService();
         try {
             System.out.println("Degrees of Separation");
-            System.out.println("Type 'back' to go back");
-            System.out.println("1. Check you degree of separation with another user");
+            System.out.println("1. Check your degree of separation with another user");
             System.out.println("2. Check 2 user's degree of separation");
+            System.out.println("3. leave Degree Menu");
             System.out.println("Please enter your choice");
             while ((choice = in.readLine()) == null && choice.length() == 0);
 
@@ -1138,38 +1139,36 @@ public class TestDriver {
                 case "2":
                     System.out.println("Enter the name of a user: ");
                     while ((username1 = in.readLine()) == null && username1.length() == 0);
-                    System.out.println("Enter the name of a user: ");
+                    System.out.println("Enter the name of another user: ");
                     while ((username2 = in.readLine()) == null && username2.length() == 0);
                     break;
+                case "3":
+                    userLandingMenu();
+                    return;
                 default:
                     System.out.println("Invalid choice");
                     degreeMenu();
-                    break;
+                    return;
             }
             if (uService.isLoginAvailable(con.stmt, username1, "UberUser") ||
                     uService.isLoginAvailable(con.stmt, username2, "UberUser")) {
                 System.out.println("One or more of those usernames does not exist, please try again");
                 degreeMenu();
+                return;
             }
-            if (sService.twoDegreesOfSeparation(con.stmt, username1, username2))
+            if (sService.twoDegreesOfSeparation(con.stmt, username1, username2)) {
                 System.out.println("Two degrees of separation");
-            else if (sService.oneDegreeOfSeparation(con.stmt, username1, username2))
+            } else if (sService.oneDegreeOfSeparation(con.stmt, username1, username2)) {
                 System.out.println("One degree of separation");
-            else
+            } else {
                 System.out.println("No degree of separation (1 or 2) was detected");
-            System.out.println("Try different users?");
-            System.out.println("1. yes");
-            System.out.println("2. no");
-            while ((choice = in.readLine()) == null && choice.length() == 0);
-            if (choice.equals("1"))
-                degreeMenu();
-            userLandingMenu();
+            }
         }
         catch(Exception e) {
             System.out.println("There was an error querying for results");
             degreeMenu();
         }
-
+        degreeMenu();
     }
 
     private static void logOut() throws Exception{
