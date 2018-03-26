@@ -87,7 +87,7 @@ public class DbStatisticsService {
             query = "SELECT AVG(cf.rating) as avg_rating, uc.vin, uc.driver, uc.category FROM " +
                     "CarFeedback cf, UberCar uc, UberDriver ud " +
                     "WHERE cf.car=uc.vin AND uc.driver=ud.login AND uc.category='" + category + "'" +
-                    " GROUP BY uc.vin ORDER BY avg_rating LIMIT " + Integer.toString(numResults);
+                    " GROUP BY uc.vin ORDER BY avg_rating DESC LIMIT " + Integer.toString(numResults);
 
             return stmt.executeQuery(query);
         }
