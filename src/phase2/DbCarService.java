@@ -13,6 +13,25 @@ import java.io.*;
 public class DbCarService {
     public DbCarService() { }
 
+    public boolean uberCarExists(Statement stmt, String vin) throws Exception {
+        String query;
+        ResultSet rs;
+        boolean exists;
+
+        try {
+            query = "SELECT * FROM UberCar WHERE vin='" + vin + "' ";
+            rs = stmt.executeQuery(query);
+            exists = rs.isBeforeFirst();
+            rs.close();
+            return exists;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            System.err.println ("Could not query for UberCar: " + e.getMessage());
+            throw(e);
+        }
+    }
+
     public void createUberCar(Statement stmt, String vin, String driver, String category, String make, String model, int year) throws Exception {
         String query;
 
