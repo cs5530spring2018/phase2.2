@@ -22,8 +22,11 @@ public class DbScoredFeedbackService {
         String results = "";
         try {
             while (rs.next()) {
-                results += "avg_rating: " + rs.getString(1) +
-                        "    car: " + rs.getString(2) + "\n";
+                results += "reviewee: " + rs.getString(1) +
+                        "    car: " + rs.getString(2) +
+                        "    reviewer: " + rs.getString(3) +
+                        "    usefulness_score: " + rs.getString(4) +
+                        "\n";
             }
             return results;
         }
