@@ -1,8 +1,8 @@
 package phase2;
 
-import java.io.BufferedReader;
+import com.sun.org.apache.xpath.internal.operations.Bool;
+
 import java.io.File;
-import java.io.InputStreamReader;
 import java.util.*;
 import java.lang.*;
 import java.sql.*;
@@ -73,34 +73,47 @@ public class InitializeDb {
             //System.out.println(carService.printableAvailableCars(rset));
             //ResultSet rset = carService.ucBrowser(con.stmt, "", "", "Toyota", "AND", "UT", "b");
             //System.out.println(carService.printableCars(rset));
-            DbStatisticsService s = new DbStatisticsService();
-            ResultSet rs = s.mostPopularUcByRide(con.stmt, 5, "luxury");
-            System.out.println(s.printablePopularRides(rs, "total_rides"));
-            rs = s.mostPopularUcByRide(con.stmt, 5, "comfort");
-            System.out.println(s.printablePopularRides(rs, "total_rides"));
-            rs = s.mostPopularUcByRide(con.stmt, 5, "economy");
-            System.out.println(s.printablePopularRides(rs, "total_rides"));
-            rs.close();
-            rs = s.mostExpensiveUcByCategory(con.stmt, 5, "luxury");
-            System.out.println(s.printablePopularRides(rs, "avg_price"));
-            rs.close();
-            rs = s.highestRatedUdByCategory(con.stmt, 5, "luxury");
-            System.out.println(s.printablePopularRides(rs, "avg_rating"));
-            rs.close();
-            rs = s.highestRatedUdByCategory(con.stmt, 5, "economy");
-            System.out.println(s.printablePopularRides(rs, "avg_rating"));
-            rs.close();
-            rs = s.highestRatedUdByCategory(con.stmt, 5, "comfort");
-            System.out.println(s.printablePopularRides(rs, "avg_rating"));
-            rs.close();
-            rs = s.mostExpensiveUcByCategory(con.stmt, 5, "comfort");
-            System.out.println(s.printablePopularRides(rs, "avg_cost"));
-            rs.close();
-            rs = s.mostExpensiveUcByCategory(con.stmt, 5, "luxury");
-            System.out.println(s.printablePopularRides(rs, "avg_cost"));
-            rs.close();
-            rs = s.mostExpensiveUcByCategory(con.stmt, 5, "economy");
-            System.out.println(s.printablePopularRides(rs, "avg_cost"));
+            //DbStatisticsService s = new DbStatisticsService();
+            //ResultSet rs;
+            //rs = s.mostPopularUcByRide(con.stmt, 5, "luxury");
+            //System.out.println(s.printableStatistics(rs, "total_rides"));
+            //rs = s.mostPopularUcByRide(con.stmt, 5, "comfort");
+            //System.out.println(s.printableStatistics(rs, "total_rides"));
+            //rs = s.mostPopularUcByRide(con.stmt, 5, "economy");
+            //System.out.println(s.printableStatistics(rs, "total_rides"));
+            //rs.close();
+            //rs = s.mostExpensiveUcByCategory(con.stmt, 5, "luxury");
+            //System.out.println(s.printableStatistics(rs, "avg_price"));
+            //rs.close();
+            //rs = s.highestRatedUdByCategory(con.stmt, 5, "luxury");
+            //System.out.println(s.printableStatistics(rs, "avg_rating"));
+            //rs.close();
+            //rs = s.highestRatedUdByCategory(con.stmt, 5, "economy");
+            //System.out.println(s.printableStatistics(rs, "avg_rating"));
+            //rs.close();
+            //rs = s.highestRatedUdByCategory(con.stmt, 5, "comfort");
+            //System.out.println(s.printableStatistics(rs, "avg_rating"));
+            //rs.close();
+            //rs = s.mostExpensiveUcByCategory(con.stmt, 5, "comfort");
+            //System.out.println(s.printableStatistics(rs, "avg_cost"));
+            //rs.close();
+            //rs = s.mostExpensiveUcByCategory(con.stmt, 5, "luxury");
+            //System.out.println(s.printableStatistics(rs, "avg_cost"));
+            //rs.close();
+            //rs = s.mostExpensiveUcByCategory(con.stmt, 5, "economy");
+            //System.out.println(s.printableStatistics(rs, "avg_cost"));
+            //rs.close();
+            //rs = s.mostUsefulUsers(con.stmt, 20);
+            //System.out.println(s.printableStatistics(rs, "avg_score"));
+            //boolean oneDegree = s.oneDegreeOfSeparation(con.stmt,"username0", "username99");
+            //System.out.println("User1 and 99: " + Boolean.toString(oneDegree));
+            //oneDegree = s.oneDegreeOfSeparation(con.stmt, "username44", "username0");
+            //System.out.println("user44 and 0: " + oneDegree);
+            //boolean twoDegree = s.twoDegreesOfSeparation(con.stmt, "username0", "username98");
+            //System.out.println("user1 and 0: " + twoDegree);
+            DbScoredFeedbackService fb = new DbScoredFeedbackService();
+            System.out.println(fb.printUsefulFeedback(fb.usefulFeedbackByDriver(con.stmt, "driverUsername10", 10)));
+
         }
         catch (Exception e)
         {
