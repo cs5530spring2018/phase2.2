@@ -568,7 +568,8 @@ public class TestDriver {
                 degreeMenu();
                 break;
             case "8":
-                //TODO: statistics menu
+                //statistics menu
+                statsMenu();
                 break;
             case "9":
                 logOut();
@@ -578,6 +579,89 @@ public class TestDriver {
                 userLandingMenu();
                 break;
         }
+    }
+
+    private static void statsMenu() throws Exception {
+        DbStatisticsService service = new DbStatisticsService();
+        String choice;
+        String numResults;
+        System.out.println("          Statistics Menu");
+        System.out.println("1. most popular cars for each category");
+        System.out.println("2. most expensive cars for each category");
+        System.out.println("3. highly rated drivers");
+        System.out.println("4. leave Statistics Menu");
+        System.out.println("please enter your choice:");
+
+        while ((choice = in.readLine()) == null && choice.length() == 0);
+        try {
+            switch (choice) {
+                case "1":
+                    System.out.println("Most Popular Cars:");
+                    System.out.println("Enter the number of most popular cars you'd like to see for each category (or type '!c' to cancel):");
+                    while ((numResults = in.readLine()) == null && numResults.length() == 0) ;
+                    if (isCancelStats(numResults)) {
+                        return;
+                    }
+                    System.out.println("          economy");
+                    System.out.println(service.printableStatistics(service.mostPopularUcByRide(con.stmt, Integer.parseInt(numResults), "economy"), "total_rides"));
+                    System.out.println("          comfort");
+                    System.out.println(service.printableStatistics(service.mostPopularUcByRide(con.stmt, Integer.parseInt(numResults), "comfort"), "total_rides"));
+                    System.out.println("          luxury");
+                    System.out.println(service.printableStatistics(service.mostPopularUcByRide(con.stmt, Integer.parseInt(numResults), "luxury"), "total_rides"));
+                    statsMenu();
+                    return;
+                case "2":
+                    System.out.println("Most Expensive Cars:");
+                    System.out.println("Enter the number of most expensive cars you'd like to see for each category (or type '!c' to cancel):");
+                    while ((numResults = in.readLine()) == null && numResults.length() == 0) ;
+                    if (isCancelStats(numResults)) {
+                        return;
+                    }
+                    System.out.println("          economy");
+                    System.out.println(service.printableStatistics(service.mostExpensiveUcByCategory(con.stmt, Integer.parseInt(numResults), "economy"), "avg_cost"));
+                    System.out.println("          comfort");
+                    System.out.println(service.printableStatistics(service.mostExpensiveUcByCategory(con.stmt, Integer.parseInt(numResults), "comfort"), "avg_cost"));
+                    System.out.println("          luxury");
+                    System.out.println(service.printableStatistics(service.mostExpensiveUcByCategory(con.stmt, Integer.parseInt(numResults), "luxury"), "avg_cost"));
+                    statsMenu();
+                    return;
+                case "3":
+                    System.out.println("Most Highly Rated Drivers:");
+                    System.out.println("Enter the number of most highly rated drivers you'd like to see for each category (or type '!c' to cancel):");
+                    while ((numResults = in.readLine()) == null && numResults.length() == 0) ;
+                    if (isCancelStats(numResults)) {
+                        return;
+                    }
+                    System.out.println("          economy");
+                    System.out.println(service.printableStatistics(service.highestRatedUdByCategory(con.stmt, Integer.parseInt(numResults), "economy"), "avg_rating"));
+                    System.out.println("          comfort");
+                    System.out.println(service.printableStatistics(service.highestRatedUdByCategory(con.stmt, Integer.parseInt(numResults), "comfort"), "avg_rating"));
+                    System.out.println("          luxury");
+                    System.out.println(service.printableStatistics(service.highestRatedUdByCategory(con.stmt, Integer.parseInt(numResults), "luxury"), "avg_rating"));
+                    statsMenu();
+                    return;
+                case "4":
+                    userLandingMenu();
+                    return;
+                default:
+                    System.out.println("Invalid Selection...");
+                    statsMenu();
+                    return;
+            }
+        } catch (Exception e) {
+            System.err.println("Something went wrong!");
+            statsMenu();
+            return;
+        }
+    }
+
+    private static boolean isCancelStats(String input) throws Exception {
+        if(input.toLowerCase().trim().equals("!c")) {
+            System.out.println("Cancelled...");
+            statsMenu();
+            return true;
+        }
+        return false;
     }
 
     private static void reviewMenu() throws Exception {
@@ -645,12 +729,6 @@ public class TestDriver {
         }
     }
 
-    private static void topNReviewsForDriver(){
-        DbCarFeedbackService service = new DbCarFeedbackService();
-        String driver;
-        String numResults;
-        System.out.println("Get the top N reviews ");
-    }
     private static void reviewCar() throws Exception{
         DbCarFeedbackService service = new DbCarFeedbackService();
         String vin;
@@ -710,6 +788,7 @@ public class TestDriver {
         }
         reviewMenu();
     }
+
     private static boolean isCancelReview(String input) throws Exception {
         if(input.toLowerCase().trim().equals("!c")) {
             System.out.println("Cancelled...");
@@ -718,6 +797,7 @@ public class TestDriver {
         }
         return false;
     }
+
     private static LocalDateTime chooseDate() throws Exception{
         String year, month, dayOfMonth, hour, minute;
         LocalDateTime date = null;
