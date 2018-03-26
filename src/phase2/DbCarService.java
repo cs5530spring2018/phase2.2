@@ -396,9 +396,14 @@ public class DbCarService {
             allData = vinsToCars(stmt, filteredCars);
             allCars.populate(allData);
             allCars.setMatchColumn(1);
-            joinedRows.addRowSet(filteredCars);
-            joinedRows.addRowSet(allCars);
-            return joinedRows;
+            if (filteredCars.isBeforeFirst()) {
+                joinedRows.addRowSet(filteredCars);
+                if (allCars.isBeforeFirst())
+                    joinedRows.addRowSet(allCars);
+                return joinedRows;
+            }
+            else
+                return filteredCars;
         }
         catch(Exception e) {
             System.err.println("Unable to execute query:"+query+"\n");
@@ -410,6 +415,8 @@ public class DbCarService {
     public String printableRecommendedCars(ResultSet rs) {
         String output = "";
         try {
+            if (!rs.isBeforeFirst())
+                return output;
             while (rs.next()) {
                 output += "ride_count: " + rs.getString(1) + "    " +
                         "vin: " + rs.getString(2) + "    " +
