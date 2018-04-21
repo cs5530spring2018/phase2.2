@@ -66,6 +66,7 @@
 <%
         }
         con.closeConnection();
+        //reload registration page here
     }
 %>
 </body>
