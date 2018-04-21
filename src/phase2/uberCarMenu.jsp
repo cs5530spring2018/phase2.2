@@ -83,6 +83,7 @@
     <input type=radio name="type" value="remove"> Remove<br>
     <input type=submit>
 </form>
+<a href="driverLandingPage.jsp">Click Here To Go Back</a>
 
 <%
 } else {
@@ -99,7 +100,9 @@
             service.createUberCar(con.stmt, vin, (String) request.getSession().getAttribute("username"), category, make, model, Integer.parseInt(year));
         }
         con.closeConnection();
+        response.sendRedirect("http://georgia.eng.utah.edu:8080/~5530u61/uberCarMenu.jsp");
     } catch (Exception e) {
+        con.closeConnection();
 %><script LANGUAGE="javascript">
     alert("something went horribly wrong!");
     window.location.href='uberCarMenu.jsp';
