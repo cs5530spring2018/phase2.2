@@ -46,7 +46,8 @@
     <input type=text name="phoneNumber" length=12 placeholder="Phone: XXX-XXX-XXXX"><br>
     <input type="checkbox" name="driver" value="isDriver">I am a Driver<br>
     <input type=submit>
-</form>
+</form><br>
+<a href="login.jsp">Already have an account? Click here to log in! </a>
 
 <%
 } else {
@@ -62,11 +63,11 @@
         service.createUser(con.stmt, username, password, name, address, phoneNumber, table);
     } else {
 %>
-<script>alert("That username has already been taken!");</script>
+<script>alert("That username has already been taken!");
+                window.location.href='register.jsp';</script>
 <%
         }
         con.closeConnection();
-        //reload registration page here
     }
 %>
 </body>

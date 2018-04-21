@@ -31,7 +31,8 @@
     <input type=password name="password" length=254 placeholder="Password"><br>
     <input type="checkbox" name="driver" value="isDriver">I am a Driver<br>
     <input type=submit>
-</form>
+</form><br>
+<a href="register.jsp">Don't have an account? Click to here to register </a>
 
 <%
 } else {
@@ -45,14 +46,19 @@
         //TODO: redirect to landing page
         if(table.equals("UberDriver")) {
             response.sendRedirect("http://georgia.eng.utah.edu:8080/~5530u61/driverLandingPage.jsp");
+        } else {
+            response.sendRedirect("http://georgia.eng.utah.edu:8080/~5530u61/userLandingPage.jsp");
         }
     } else {
+        con.closeConnection();
 %>
-<script>alert("Login failed! Check username/password, and make sure to check the box if you are a driver!");</script>
+<script LANGUAGE="javascript">
+    alert("Login failed! Check username/password, and make sure to check the box if you are a driver!");
+    window.location.href='login.jsp';
+</script>
 <%
         }
         con.closeConnection();
-        //TODO: reload login page here
     }
 %>
 </body>

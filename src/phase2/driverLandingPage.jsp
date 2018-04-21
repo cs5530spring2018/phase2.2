@@ -9,7 +9,9 @@
     <% String username = (String)request.getSession().getAttribute("username"); %>
 
 <p>Welcome, <%=username%>!</p>
-<a href="login.jsp">login</a><br>
-<a href="register.jsp">register</a>
+    <p>You are logged in as a Driver!</p>
+<a href="">Your UberCar Menu</a><br>
+<a href="">Your HoursOfOp Menu</a>
+<a href="index.html">Logout</a>
 </body>
 </html>
