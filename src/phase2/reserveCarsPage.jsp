@@ -190,6 +190,7 @@
 </script>
 <%
     } catch (Exception e) {
+        con.closeConnection();
 %>
 <script LANGUAGE="javascript">
     alert("something went horribly wrong!");
