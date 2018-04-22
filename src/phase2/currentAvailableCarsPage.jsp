@@ -32,6 +32,7 @@
 <body>
 
 <%
+    try {
     Connector con = new Connector();
     DbCarService service = new DbCarService();
     ResultSet rs = service.availableCars(con.stmt, Util.getNowTimeAsFloat(), Util.dayOfTheWeekAdjuster(LocalDateTime.now().getDayOfWeek().getValue()));
@@ -60,7 +61,16 @@
         <td><%=rs.getString("year")%>
         </td>
     </tr>
-    <% } %>
+    <% }
+    } catch (Exception e) {
+        con.closeConnection();
+        %>
+        <script LANGUAGE="javascript">
+            alert("something went horribly wrong!");
+            window.location.href = 'currentAvailableCarsPage.jsp';
+        </script>
+        <%
+    }%>
 </table>
 <%
     String filledFrom = request.getParameter("filledFrom");
