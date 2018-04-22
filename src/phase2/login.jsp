@@ -2,6 +2,7 @@
 <html>
 <head>
     <script LANGUAGE="javascript">
+
         function check_all_fields(form_obj) {
             if (form_obj.username.value == "") {
                 alert("username cannot be blank");
@@ -13,6 +14,7 @@
             }
             return true;
         }
+
     </script>
 </head>
 <body>
