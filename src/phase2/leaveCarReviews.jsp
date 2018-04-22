@@ -35,7 +35,7 @@
 %>
 
 <p>Review a Car</p>
-<form name="register" method=get onsubmit="return check_all_fields(this)" action="login.jsp">
+<form name="register" method=get onsubmit="return check_all_fields(this)" action="leaveCarReviews.jsp">
     <input type=hidden name="filledLoginFrom" value="filled">
     <input type=text name="vin" length=254 placeholder="VIN #"><br>
     <input type=text name="rating" length=254 placeholder="Rating 0-10"><br>
@@ -73,7 +73,7 @@
             con.closeConnection();
 %>
             <script LANGUAGE="javascript">
-                alert("Feedback Created!");
+                alert("Review Created!");
                 window.location.href='leaveCarReviews.jsp';
             </script>
 <%
@@ -82,7 +82,7 @@
     con.closeConnection();
 %>
     <script LANGUAGE="javascript">
-        alert("Something went wrong!  Please verify the VIN number and try again!");
+        alert("Something went wrong!  Please try again!");
         window.location.href='leaveCarReviews.jsp';
     </script>
 <%

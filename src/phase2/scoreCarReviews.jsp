@@ -39,7 +39,7 @@
 
 <p>Score a User Review</p>
 <p>0 is 'useless', 1 is 'useful', 2 is 'very useful'</p>
-<form name="register" method=get onsubmit="return check_all_fields(this)" action="login.jsp">
+<form name="register" method=get onsubmit="return check_all_fields(this)" action="scoreCarReviews.jsp">
     <input type=hidden name="filledLoginFrom" value="filled">
     <input type=text name="vin" length=254 placeholder="VIN #"><br>
     <input type=text name="reviewer" length=254 placeholder="Reviewer's Username"><br>
@@ -94,7 +94,7 @@
     con.closeConnection();
 %>
 <script LANGUAGE="javascript">
-    alert("Something went wrong!  Please verify the VIN number and try again!");
+    alert("Something went wrong!  Please try again!");
     window.location.href='scoreCarReviews.jsp';
 </script>
 <%
