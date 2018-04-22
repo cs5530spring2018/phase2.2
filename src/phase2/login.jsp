@@ -43,6 +43,7 @@
     DbUserService service = new DbUserService();
     if (service.attemptToLogIn(con.stmt, username, password, table)) {
         request.getSession().setAttribute("username", username);
+        con.closeConnection();
         //TODO: redirect to landing page
         if(table.equals("UberDriver")) {
             response.sendRedirect("http://georgia.eng.utah.edu:8080/~5530u61/driverLandingPage.jsp");
