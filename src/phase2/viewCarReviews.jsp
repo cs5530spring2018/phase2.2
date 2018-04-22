@@ -41,8 +41,8 @@
     if (request.getParameter("vin") != null)
         vin = request.getParameter("vin");
 
+    Connector con = new Connector();
     try {
-        Connector con = new Connector();
         DbCarService carService = new DbCarService();
         DbCarFeedbackService fbService = new DbCarFeedbackService();
 

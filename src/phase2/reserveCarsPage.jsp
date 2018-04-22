@@ -141,8 +141,8 @@
     String distance = request.getParameter("distance");
     String to = request.getParameter("to");
     String from = request.getParameter("from");
+    Connector con = new Connector();
     try {
-        Connector con = new Connector();
         DbCarService carService = new DbCarService();
         DbReservationService reservationService = new DbReservationService();
         if (!carService.uberCarExists(con.stmt, vin)) {

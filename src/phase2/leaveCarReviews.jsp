@@ -47,6 +47,7 @@
 
 <%
 } else {
+    Connector con = new Connector();
     try {
         String vin = "";
         String rating = "";
@@ -57,7 +58,7 @@
             rating = request.getParameter("rating");
         if (request.getParameter("comment") != null)
             comment = request.getParameter("comment");
-        Connector con = new Connector();
+
         DbCarService carService = new DbCarService();
         DbCarFeedbackService fbService = new DbCarFeedbackService();
         if (!carService.uberCarExists(con.stmt, vin)) {

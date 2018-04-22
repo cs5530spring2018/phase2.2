@@ -42,6 +42,7 @@
 
 <%
 } else {
+    Connector con = new Connector();
     try {
         String driver = "";
         String limit = "";
@@ -50,7 +51,6 @@
         if (request.getParameter("limit") != null)
             limit = request.getParameter("limit");
 
-        Connector con = new Connector();
         DbUserService uService = new DbUserService();
         DbScoredFeedbackService fbService = new DbScoredFeedbackService();
         if (uService.isLoginAvailable(con.stmt, driver, "UberDriver")) {
