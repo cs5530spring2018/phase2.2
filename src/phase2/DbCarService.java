@@ -359,21 +359,22 @@ public class DbCarService {
                     "            as q1 \n" +
                     "         where r2.rider=q1.rider \n" +
                     "         group by r2.car \n" +
-                    "         order by c";
+                    "         order by c DESC ";
             vins = stmt.executeQuery(query);
-            filteredCars.populate(vins);
-            filteredCars.setMatchColumn(2);
-            allData = vinsToCars(stmt, filteredCars);
-            allCars.populate(allData);
-            allCars.setMatchColumn(1);
-            if (filteredCars.isBeforeFirst()) {
-                joinedRows.addRowSet(filteredCars);
-                if (allCars.isBeforeFirst())
-                    joinedRows.addRowSet(allCars);
-                return joinedRows;
-            }
-            else
-                return filteredCars;
+            //filteredCars.populate(vins);
+            //filteredCars.setMatchColumn(2);
+            //allData = vinsToCars(stmt, filteredCars);
+            //allCars.populate(allData);
+            //allCars.setMatchColumn(1);
+            //if (filteredCars.isBeforeFirst()) {
+             //   joinedRows.addRowSet(filteredCars);
+              //  if (allCars.isBeforeFirst())
+               //     joinedRows.addRowSet(allCars);
+                //return joinedRows;
+            //}
+            //else
+              //  return filteredCars;
+            return vins;
         }
         catch(Exception e) {
             System.err.println("Unable to execute query:"+query+"\n");

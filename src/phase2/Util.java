@@ -1,6 +1,7 @@
 package phase2;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public class Util {
     public static float convertTime(String hour, String minute) {
@@ -19,5 +20,16 @@ public class Util {
         BigDecimal bd = new BigDecimal(Float.toString(d));
         bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
         return bd.floatValue();
+    }
+    public static Float getNowTimeAsFloat() {
+        LocalDateTime now = LocalDateTime.now();
+        return convertTime(Integer.toString(now.getHour()), Integer.toString(now.getMinute()));
+    }
+    /**Our DB entries have dates 0 (Sun) - 6 (Sat)
+     * LocalDateTime has dates 1 (Mon) - 7 (Sun)
+     * This adjusts the date so Sun uses 0 instead of 7*/
+    public static int dayOfTheWeekAdjuster(int dayOfTheWeek){
+        if(dayOfTheWeek == 7) { return 0; }
+        return dayOfTheWeek;
     }
 }

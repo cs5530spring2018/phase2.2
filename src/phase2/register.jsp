@@ -61,13 +61,21 @@
     DbUserService service = new DbUserService();
     if(service.isLoginAvailable(con.stmt, username, table)) {
         service.createUser(con.stmt, username, password, name, address, phoneNumber, table);
+        con.closeConnection();
+
+%>
+<script LANGUAGE="javascript">
+    alert("account successfully registered, please log in");
+    window.location.href = 'login.jsp';
+</script>
+<%
     } else {
+        con.closeConnection();
 %>
 <script>alert("That username has already been taken!");
-                window.location.href='register.jsp';</script>
+window.location.href = 'register.jsp';</script>
 <%
         }
-        con.closeConnection();
     }
 %>
 </body>
