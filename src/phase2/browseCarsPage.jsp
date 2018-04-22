@@ -69,7 +69,8 @@
 
     Connector con = new Connector();
     DbCarService service = new DbCarService();
-    rs = service.ucBrowser(con.stmt, category, andor1, model, andor2, location, sort);
+    try {
+        rs = service.ucBrowser(con.stmt, category, andor1, model, andor2, location, sort);
 
     if (sort.equals("")) {
 %>
@@ -136,6 +137,15 @@
 <%
     }
     con.closeConnection();
-}
+} catch (Exception e) {
+        con.closeConnection();
+        %>
+            <script LANGUAGE="javascript">
+                alert("Something went wrong! Please try again!");
+                window.location.href='favoriteCarsPage.jsp';
+            </script>
+                <%
+    }
+    }
 %>
 </body>
