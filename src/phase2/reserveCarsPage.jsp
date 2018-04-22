@@ -193,7 +193,7 @@
 %>
 <script LANGUAGE="javascript">
     alert("something went horribly wrong!");
-    window.location.href = 'currentAvailableCarsPage.jsp';
+    window.location.href = 'reserveCarsPage.jsp';
 </script>
 <%
         }
