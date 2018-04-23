@@ -78,6 +78,7 @@
         DbCarService carService = new DbCarService();
         LocalDateTime date = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day), Integer.parseInt(hour), Integer.parseInt(minute));
         request.getSession().setAttribute("date", date);
+        try {
         ResultSet rs = carService.availableCars(con.stmt, Util.convertTime(Integer.toString(date.getHour()), Integer.toString(date.getMinute())),
             Util.dayOfTheWeekAdjuster(date.getDayOfWeek().getValue()));
 
@@ -109,6 +110,9 @@
     <% }
         rs.close();
         con.closeConnection();
+    } catch (Exception e) {
+        con.closeConnection();
+        }
     }%>
 </table>
 <%
@@ -137,9 +141,19 @@
     String distance = request.getParameter("distance");
     String to = request.getParameter("to");
     String from = request.getParameter("from");
+    Connector con = new Connector();
     try {
-        Connector con = new Connector();
+        DbCarService carService = new DbCarService();
         DbReservationService reservationService = new DbReservationService();
+        if (!carService.uberCarExists(con.stmt, vin)) {
+            con.closeConnection();
+            %>
+            <script LANGUAGE="javascript">
+                alert("That car does not exist! Please check the vin and try again!");
+                window.location.href = 'reserveCarsPage.jsp';
+            </script>
+            <%
+        }
         LocalDateTime date2 = (LocalDateTime) request.getSession().getAttribute("date");
         if(date2 != null){
             reservationService.createReservation(con.stmt, (String) request.getSession().getAttribute("username"), vin, date2);
@@ -149,7 +163,6 @@
             window.location.href = 'reserveCarsPage.jsp';
             </script> <%
         }
-        DbCarService carService = new DbCarService();
         ResultSet rs = carService.recommendedCars(con.stmt, vin);
 %>
 <p>Enter a new date to make another reservation</p>
@@ -177,13 +190,13 @@
 </script>
 <%
     } catch (Exception e) {
+        con.closeConnection();
 %>
 <script LANGUAGE="javascript">
     alert("something went horribly wrong!");
-    window.location.href = 'currentAvailableCarsPage.jsp';
+    window.location.href = 'reserveCarsPage.jsp';
 </script>
 <%
         }
     }%>
-</table>
 </body>

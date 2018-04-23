@@ -1,4 +1,5 @@
 <%@ page language="java" import="phase2.*" %>
+<%@ page import="java.sql.ResultSet" %>
 <html>
 <head>
     <script LANGUAGE="javascript">
@@ -25,8 +26,8 @@
     if( filledLoginFrom == null ){
 %>
 
-<p>Favorite a Car</p>
-<form name="register" method=get onsubmit="return check_all_fields(this)" action="favoriteCarsPage.jsp">
+<p>View a Car's Reviews</p>
+<form name="register" method=get onsubmit="return check_all_fields(this)" action="viewCarReviews.jsp">
     <input type=hidden name="filledLoginFrom" value="filled">
     <input type=text name="vin" length=254 placeholder="VIN #"><br>
     <input type=submit>
@@ -40,45 +41,63 @@
     String vin = "";
     if (request.getParameter("vin") != null)
         vin = request.getParameter("vin");
+
     Connector con = new Connector();
-    DbCarService carService = new DbCarService();
-    DbFavoritesService fService = new DbFavoritesService();
     try {
+        DbCarService carService = new DbCarService();
+        DbCarFeedbackService fbService = new DbCarFeedbackService();
+
         if (!carService.uberCarExists(con.stmt, vin)) {
             con.closeConnection();
-            %>
-                <script LANGUAGE="javascript">
-                    alert("Car does not exist!  Please verify the VIN number and try again!");
-                    window.location.href='favoriteCarsPage.jsp';
-                </script>
-            <%
-        } else if (fService.favoriteExists(con.stmt, username, vin)) {
-            con.closeConnection();
-            %>
-                <script LANGUAGE="javascript">
-                    alert("Already Favorited!");
-                    window.location.href='favoriteCarsPage.jsp';
-                </script>
-            <%
-        } else {
-            fService.createFavorite(con.stmt, username, vin);
-            con.closeConnection();
-            %>
+%>
             <script LANGUAGE="javascript">
-                alert("Favorited!");
+                alert("Car does not exist!  Please verify the VIN number and try again!");
                 window.location.href='favoriteCarsPage.jsp';
             </script>
-            <%
-        }
+<%
+        } else {
+
+        ResultSet rs = fbService.fetchFeedbackForCar(con.stmt, vin);
+%>
+<a href="reviewsMenuPage.jsp">back to review page</a><br>
+<a href="userLandingPage.jsp">home</a><br>
+<a href="viewCarReviews.jsp">do another search</a><br>
+<p>If no reviews are listed, the car has no reviews.</p>
+<table>
+    <tr>
+        <th>Reviewer</th>
+        <th>VIN</th>
+        <th>RATING</th>
+        <th>COMMENT</th>
+        <th>DATE</th>
+    </tr>
+    <% while (rs.next()) { %>
+    <tr>
+        <td><%=rs.getString(1)%>
+        </td>
+        <td><%=rs.getString(2)%>
+        </td>
+        <td><%=rs.getString(3)%>
+        </td>
+        <td><%=rs.getString(4)%>
+        </td>
+        <td><%=rs.getString(5)%>
+        </td>
+    </tr>
+    <% }
+    }
     } catch (Exception e) {
         con.closeConnection();
-        %>
-        <script LANGUAGE="javascript">
-            alert("Something went wrong!  Please verify the VIN number and try again!");
-            window.location.href='favoriteCarsPage.jsp';
-        </script>
-        <%
-    }
+    %>
+    <script LANGUAGE="javascript">
+        alert("something went horribly wrong!");
+        window.location.href = 'viewCarReviews.jsp';
+    </script>
+    <%
+        }%>
+</table>
+<%
+        con.closeConnection();
     }
 %>
 </body>

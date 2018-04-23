@@ -12,6 +12,6 @@
 <a href="leaveCarReviews.jsp">leave a review for a car</a><br>
 <a href="scoreCarReviews.jsp">score someone's review</a><br>
 <a href="viewUsefulReviews.jsp">view most useful reviews</a><br>
-<a href="userLandingPage.jsp">home</a>
+<a href="userLandingPage.jsp">back to landing page</a>
 </body>
 </html>
