@@ -87,7 +87,7 @@
             con.closeConnection();
 %>
             <script LANGUAGE="javascript">
-                alert("Review Scored!");
+                alert("Review Scored or Updated!");
                 window.location.href='scoreCarReviews.jsp';
             </script>
 <%
