@@ -5,7 +5,7 @@
     <script LANGUAGE="javascript">
 
         function check_all_fields(form_obj) {
-            if (form_obj.vin.value == null) {
+            if (form_obj.vin.value == "") {
                 alert("VIN cannot be blank");
                 return false;
             }
@@ -27,11 +27,12 @@
 %>
 
 <p>View a Car's Reviews</p>
-<form name="register" method=get onsubmit="return check_all_fields(this)" action="login.jsp">
+<form name="register" method=get onsubmit="return check_all_fields(this)" action="viewCarReviews.jsp">
     <input type=hidden name="filledLoginFrom" value="filled">
     <input type=text name="vin" length=254 placeholder="VIN #"><br>
     <input type=submit>
 </form><br>
+<a href="reviewsMenuPage.jsp">back to review page</a><br>
 <a href="userLandingPage.jsp">back to landing page</a><br>
 <a href="browseCarsPage.jsp">browse cars</a>
 
@@ -55,9 +56,10 @@
             </script>
 <%
         } else {
-<%
+
         ResultSet rs = fbService.fetchFeedbackForCar(con.stmt, vin);
 %>
+<a href="reviewsMenuPage.jsp">back to review page</a><br>
 <a href="userLandingPage.jsp">home</a><br>
 <a href="viewCarReviews.jsp">do another search</a><br>
 <p>If no reviews are listed, the car has no reviews.</p>
@@ -81,8 +83,6 @@
         </td>
         <td><%=rs.getString(5)%>
         </td>
-        <td><%=rs.getString("year")%>
-        </td>
     </tr>
     <% }
     }
@@ -91,7 +91,7 @@
     %>
     <script LANGUAGE="javascript">
         alert("something went horribly wrong!");
-        window.location.href = 'currentAvailableCarsPage.jsp';
+        window.location.href = 'viewCarReviews.jsp';
     </script>
     <%
         }%>

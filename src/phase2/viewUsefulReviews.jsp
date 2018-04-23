@@ -6,11 +6,11 @@
     <script LANGUAGE="javascript">
 
         function check_all_fields(form_obj) {
-            if (form_obj.frivern.value == null) {
-                alert("VIN cannot be blank");
+            if (form_obj.driver.value == "") {
+                alert("Driver cannot be blank");
                 return false;
             }
-            if (form_obj.limit.value == null) {
+            if (form_obj.limit.value == "") {
                 alert("Limit cannot be blank");
                 return false;
             }
@@ -38,6 +38,7 @@
     <input type=text name="limit" length=254 placeholder="Review Limit"><br>
     <input type=submit>
 </form><br>
+<a href="reviewsMenuPage.jsp">back to review page</a><br>
 <a href="userLandingPage.jsp">back to landing page</a><br>
 
 <%
@@ -62,8 +63,9 @@
             </script>
 <%
         } else {
-            ResultSet rs = fbService.usefulFeedbackByDriver(con.stmt, driver, limit);
+            ResultSet rs = fbService.usefulFeedbackByDriver(con.stmt, driver, Integer.parseInt(limit));
 %>
+            <a href="reviewsMenuPage.jsp">back to review page</a><br>
             <a href="userLandingPage.jsp">back to landing page</a><br>
             <a href="viewUsefulReviews.jsp">do another search</a><br>
             <p>If no reviews are listed, the car has no reviews.</p>
@@ -93,7 +95,6 @@
                 </tr>
                     <% }
 
-<%
     con.closeConnection();
     }
 } catch (Exception e) {

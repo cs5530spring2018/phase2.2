@@ -5,7 +5,7 @@
     <script LANGUAGE="javascript">
 
         function check_all_fields(form_obj) {
-            if (form_obj.vin.value == null) {
+            if (form_obj.vin.value == "") {
                 alert("VIN cannot be blank");
                 return false;
             }
@@ -13,7 +13,7 @@
                 alert("VIN cannot be blank");
                 return false;
             }
-            if (form_obj.rating.value == null) {
+            if (form_obj.rating.value == "") {
                 alert("Rating cannot be blank");
                 return false;
             }
@@ -42,6 +42,7 @@
     <input type=text name="comment" length=254 placeholder="Comment (optional)"><br>
     <input type=submit>
 </form><br>
+<a href="reviewsMenuPage.jsp">back to review page</a><br>
 <a href="userLandingPage.jsp">back to landing page</a><br>
 <a href="browseCarsPage.jsp">browse cars</a>
 
@@ -70,11 +71,11 @@
                 </script>
 <%
         } else {
-            fbService.createCarFeedback(con.stmt, username, vin, rating, comment, LocalDateTime.now());
+            fbService.createCarFeedback(con.stmt, username, vin, Integer.parseInt(rating), comment, LocalDateTime.now());
             con.closeConnection();
 %>
             <script LANGUAGE="javascript">
-                alert("Review Created!");
+                alert("Review Created or Updated!");
                 window.location.href='leaveCarReviews.jsp';
             </script>
 <%

@@ -5,7 +5,7 @@
     <script LANGUAGE="javascript">
 
         function check_all_fields(form_obj) {
-            if (form_obj.vin.value == null) {
+            if (form_obj.vin.value == "") {
                 alert("VIN cannot be blank");
                 return false;
             }
@@ -13,11 +13,11 @@
                 alert("VIN cannot be blank");
                 return false;
             }
-            if (form_obj.reviewer.value == null) {
+            if (form_obj.reviewer.value == "") {
                 alert("Reviewer cannot be blank");
                 return false;
             }
-            if (form_obj.score.value == null) {
+            if (form_obj.score.value == "") {
                 alert("Score cannot be blank");
             }
             else if (isNaN(form_obj.score.value) || Number(form_obj.score.value) < 0 || Number(form_obj.score.value) > 2) {
@@ -46,6 +46,7 @@
     <input type=text name="score" length=1 placeholder="Score 0-2"><br>
     <input type=submit>
 </form><br>
+<a href="reviewsMenuPage.jsp">back to review page</a><br>
 <a href="userLandingPage.jsp">back to landing page</a><br>
 <a href="viewCarReviews.jsp">browse reviews</a>
 
@@ -59,7 +60,7 @@
         if (request.getParameter("vin") != null)
             vin = request.getParameter("vin");
         if (request.getParameter("reviewer") != null)
-            reviewer = request.getParameter("rating");
+            reviewer = request.getParameter("reviewer");
         if (request.getParameter("score") != null)
             score = request.getParameter("score");
 
@@ -82,7 +83,7 @@
             </script>
 <%
         } else {
-            fbService.createScoredFeedback(con.stmt, reviewer, vin, username, score);
+            fbService.createScoredFeedback(con.stmt, reviewer, vin, username, Integer.parseInt(score));
             con.closeConnection();
 %>
             <script LANGUAGE="javascript">
@@ -95,7 +96,7 @@
     con.closeConnection();
 %>
 <script LANGUAGE="javascript">
-    alert("Something went wrong!  Please try again!");
+    alert("Looks like that user didn't review that car! Please check input and try again!");
     window.location.href='scoreCarReviews.jsp';
 </script>
 <%

@@ -4,7 +4,7 @@
     <script LANGUAGE="javascript">
 
         function check_all_fields(form_obj) {
-            if (form_obj.vin.value == null) {
+            if (form_obj.vin.value == "") {
                 alert("VIN cannot be blank");
                 return false;
             }
@@ -26,11 +26,12 @@
 %>
 
 <p>Favorite a Car</p>
-<form name="register" method=get onsubmit="return check_all_fields(this)" action="login.jsp">
+<form name="register" method=get onsubmit="return check_all_fields(this)" action="favoriteCarsPage.jsp">
     <input type=hidden name="filledLoginFrom" value="filled">
     <input type=text name="vin" length=254 placeholder="VIN #"><br>
     <input type=submit>
 </form><br>
+<a href="reviewsMenuPage.jsp">back to review page</a><br>
 <a href="userLandingPage.jsp">back to landing page</a><br>
 <a href="browseCarsPage.jsp">browse cars</a>
 
@@ -55,7 +56,7 @@
             con.closeConnection();
             %>
                 <script LANGUAGE="javascript">
-                    alert("Car does not exist!  Please verify the VIN number and try again!");
+                    alert("Already Favorited!");
                     window.location.href='favoriteCarsPage.jsp';
                 </script>
             <%
